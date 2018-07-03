@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="220.0" prefWidth="275.0" xmlns="http://javafx.com/javafx/8.0.141"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.initial.InitialWindowController">
+   <Label text="Зайти как:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0">
+      <font>
+         <Font size="18.0"/>
+      </font>
+   </Label>
+   <AnchorPane AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+      <Label text="Логин:" AnchorPane.leftAnchor="0.0">
+         <font>
+            <Font size="16.0"/>
+         </font>
+      </Label>
+      <TextField fx:id="login" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="0.0"/>
+   </AnchorPane>
+   <AnchorPane layoutX="10.0" layoutY="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
+               AnchorPane.topAnchor="80.0">
+      <Label text="Пароль:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font size="16.0"/>
+         </font>
+      </Label>
+      <PasswordField fx:id="password" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="0.0"/>
+   </AnchorPane>
+   <Label text="Регистрация" textFill="BLUE" underline="true" AnchorPane.bottomAnchor="20.0"
+          AnchorPane.rightAnchor="80.0" onMouseClicked="#onSignUp">
+      <font>
+         <Font size="15.0"/>
+      </font>
+      <cursor>
+         <Cursor fx:constant="HAND"/>
+      </cursor>
+   </Label>
+   <Button mnemonicParsing="false" text="Войти" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="10.0" onAction="#onSignIn"/>
+   <Label fx:id="errorLabel" maxHeight="35.0" maxWidth="245.0" textFill="RED" AnchorPane.leftAnchor="15.0"
+          AnchorPane.topAnchor="145.0"/>
+   <CheckBox fx:id="remember" layoutX="14.0" layoutY="124.0" mnemonicParsing="false" text="Запомнить меня"
+             AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="120.0"/>
+</AnchorPane>

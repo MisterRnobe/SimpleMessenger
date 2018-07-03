@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.141"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.registration.FirstPageController">
+   <VBox spacing="10.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="60.0">
+      <AnchorPane>
+         <Label text="Логин" AnchorPane.leftAnchor="0.0">
+            <font>
+               <Font size="16.0"/>
+            </font>
+         </Label>
+         <TextField fx:id="login" prefWidth="150.0" promptText="Login" AnchorPane.rightAnchor="0.0"/>
+      </AnchorPane>
+      <AnchorPane layoutX="10.0" layoutY="10.0">
+         <children>
+            <Label text="Имя" AnchorPane.leftAnchor="0.0">
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+            <TextField fx:id="firstName" prefWidth="150.0" promptText="First name" AnchorPane.rightAnchor="0.0"/>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="10.0" layoutY="35.0">
+         <children>
+            <Label text="Фамилия" AnchorPane.leftAnchor="0.0">
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+            <TextField fx:id="lastName" prefWidth="150.0" promptText="Last name" AnchorPane.rightAnchor="0.0"/>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="10.0" layoutY="80.0">
+         <children>
+            <Label text="Phone number" AnchorPane.leftAnchor="0.0">
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+            <TextField fx:id="phoneNumber" prefWidth="150.0" promptText="Phone number" AnchorPane.rightAnchor="0.0"/>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="10.0" layoutY="60.0">
+         <children>
+            <PasswordField fx:id="password1" promptText="Password" AnchorPane.rightAnchor="0.0"/>
+            <Label text="Пароль" AnchorPane.leftAnchor="0.0">
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="10.0" layoutY="85.0">
+         <children>
+            <Label text="Пароль еще раз" AnchorPane.leftAnchor="0.0">
+               <font>
+                  <Font size="16.0"/>
+               </font>
+            </Label>
+            <PasswordField fx:id="password2" promptText="Password" AnchorPane.rightAnchor="0.0"/>
+         </children>
+      </AnchorPane>
+   </VBox>
+   <ButtonBar AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="40.0">
+      <buttons>
+         <Button mnemonicParsing="false" text="Cancel" onAction="#onCancel"/>
+         <Button layoutX="135.0" layoutY="18.0" mnemonicParsing="false" text="Next" onAction="#onNext"/>
+      </buttons>
+   </ButtonBar>
+   <Label fx:id="errorLabel" maxHeight="55.0" maxWidth="270.0" textFill="RED" wrapText="true" AnchorPane.leftAnchor="40.0"
+          AnchorPane.topAnchor="300.0">
+      <font>
+         <Font size="14.0"/>
+      </font>
+   </Label>
+</AnchorPane>

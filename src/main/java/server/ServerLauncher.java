@@ -3,7 +3,8 @@ package server;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import server.servlet.EventServlet;
+import server.servlet.LoginServlet;
+import server.servlet.RegistrationServlet;
 
 public class ServerLauncher {
     public static void main(String[] args) {
@@ -27,12 +28,13 @@ public class ServerLauncher {
 
 
 
-        contextHandler.addServlet(EventServlet.class,"/*");
+        //contextHandler.addServlet(EventServlet.class,"/*");
+        contextHandler.addServlet(RegistrationServlet.class, "/reg/");
+        contextHandler.addServlet(LoginServlet.class, "/login/");
+        DatabaseConnector.init();
         try {
             server.start();
             server.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
