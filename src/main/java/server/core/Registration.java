@@ -22,6 +22,7 @@ public class Registration {
 
             DatabaseConnector.getInstance().addUser(map);
             response.put("status", "OK");
+
         }
         catch (RequestError e)
         {

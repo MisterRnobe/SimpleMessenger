@@ -22,10 +22,15 @@ public class Login {
         }
         else
         {
-            String token = generateToken(map.get("login"));
             response.setStatus(Response.OK);
-            response.setBody(token);
-            DatabaseConnector.getInstance().setToken(map.get("login"), token);
+            String token = DatabaseConnector.getInstance().getUserToken(map.get("login"));
+            if (token == null)
+            {
+                token = generateToken(map.get("login"));
+                DatabaseConnector.getInstance().setToken(map.get("login"), token);
+            }
+            response.setBody(DatabaseConnector.CustomMap.create().add("token", token));
+
         }
         return response;
     }

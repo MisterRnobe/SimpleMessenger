@@ -30,8 +30,10 @@ public class Errors {
     public static final int NOT_EXIST = 50;
     public static final int BAD_PASSWORD = 51;
 
+
     //Common
     public static final int WRONG_REQUEST_PARAMETERS = 1000;
+    public static final int INTERNAL_ERROR = 1001;
 
 
 }

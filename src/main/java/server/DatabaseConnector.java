@@ -6,16 +6,12 @@ import com.alibaba.fastjson.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DatabaseConnector {
     private static DatabaseConnector instance;
-    public static void init()
+    static void init()
     {
         instance = new DatabaseConnector();
     }
@@ -58,6 +54,11 @@ public class DatabaseConnector {
         if (values.size() != 5)
             throw new RuntimeException("Wrong number of user's fields.");
         insert(values, "users");
+        insert(new TreeMap<String, String>(){{
+           this.put("login", values.get("login"));
+           this.put("last_online", Long.toString(System.currentTimeMillis()));
+           this.put("online", "0");
+        }}, "online");
     }
     public void setToken(String login, String token)
     {
@@ -66,24 +67,105 @@ public class DatabaseConnector {
             this.put("token", token);
         }}, "tokens");
     }
-    private void insert(Map<String, String> map, String table)
+    public int createDialog(String creator, String partner)
+    {
+        int dialogId = insert(new TreeMap<String, String>(){{
+            this.put("creator", creator);
+            this.put("type", "0");
+        }}, "dialogs");
+        if (dialogId == -1)
+            return dialogId;
+        insert(new TreeMap<String, String>(){{
+            this.put("login", partner);
+            this.put("dialog_id", Integer.toString(dialogId));
+        }}, "user_dialog");
+        insert(new TreeMap<String, String>(){{
+            this.put("login", creator);
+            this.put("dialog_id", Integer.toString(dialogId));
+        }}, "user_dialog");
+        return dialogId;
+    }
+    public String getUserToken(String login)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            String query = "SELECT token from tokens WHERE login = "+wrapInQuotes(login)+";";
+            ResultSet resultSet = statement.executeQuery(query);
+            String result = resultSet.next()? resultSet.getString(1): null;
+            resultSet.close();
+            statement.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private int insert(Map<String, String> map, String table)
     {
         try{
-            Statement statement = connection.createStatement();
-
+//            Statement statement = connection.createStatement();
+//
             String[] wrapped = wrap(map);
-
             String query = "INSERT INTO "+table+" ("+wrapped[0]+") VALUES ("+wrapped[1]+");";
+            System.out.println(query);
+            PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            statement.executeUpdate();
+            try(ResultSet generatedKey = statement.getGeneratedKeys())
+            {
+              if (generatedKey.next())
+                  return generatedKey.getInt(1);
+              else
+                  return -1;
+            }
+//
+//            int id = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+//            statement.close();
+//            return id;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    public boolean checkToken(String login, String token)
+    {
+        return checkExistence(new TreeMap<String, String>(){{
+            this.put("token", token);
+            this.put("login", login);
+        }}, "tokens");
+    }
+    public void setOnline(String login)
+    {
+        update("login", login, new TreeMap<String, String>(){{
+            this.put("online", "1");
+        }}, "online");
+    }
+    public void setOffline(String login)
+    {
+        update("login", login, new TreeMap<String, String>(){{
+            this.put("online", "0");
+            this.put("last_online", Long.toString(System.currentTimeMillis()));
+        }}, "online");
+    }
+    private void update(String field, String id, Map<String, String> values, String table)
+    {
+        try
+        {
+            Statement statement = connection.createStatement();
+            String newValues = values.entrySet().stream()
+                    .map(e-> e.getKey() +" = "+ (e.getKey().equals("password")? wrapPassword(e.getValue()): wrapInQuotes(e.getValue())))
+                    .collect(Collectors.joining(", "));
+            String query = "UPDATE " + table+" SET " + newValues+" WHERE "+field+" = "+wrapInQuotes(id)+";";
             System.out.println(query);
             statement.executeUpdate(query);
             statement.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     //True, if exists
-    public boolean checkExistence(Map<String, String> values, String table)
+    private boolean checkExistence(Map<String, String> values, String table)
     {
         try {
             Statement statement = connection.createStatement();
@@ -111,6 +193,18 @@ public class DatabaseConnector {
             e.printStackTrace();
             return false;
         }
+    }
+    public void setLastMessage(String dialogId, String messageId)
+    {
+        update("dialog_id", dialogId, CustomMap.create().add("last_message_id", messageId), "dialogs");
+    }
+    public int addMessage(String dialogId, String sender, String text)
+    {
+        return insert(CustomMap.create()
+                .add("sender", sender)
+                .add("dialog_id", dialogId)
+                .add("text",text)
+                .add("time",Long.toString(System.currentTimeMillis())),"messages");
     }
 
     public boolean checkUserExistence(String field, String value)
@@ -151,6 +245,38 @@ public class DatabaseConnector {
         fields.deleteCharAt(fields.length() - 1);
         return new String[]{fields.toString(), vals.toString()};
 
+    }
+    public List<String> getUsersInDialog(String dialogId)
+    {
+        try (Statement statement = connection.createStatement())
+        {
+            String query = "SELECT login from user_dialog WHERE dialog_id = "+wrapInQuotes(dialogId)+";";
+            System.out.println(query);
+            try(ResultSet resultSet = statement.executeQuery(query))
+            {
+                List<String> users = new LinkedList<>();
+                while (resultSet.next())
+                {
+                    users.add(resultSet.getString(1));
+                }
+                return users;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static class CustomMap extends TreeMap<String, String>
+    {
+        public static CustomMap create()
+        {
+            return new CustomMap();
+        }
+        public CustomMap add(String key, String value)
+        {
+            this.put(key, value);
+            return this;
+        }
     }
 
 }
