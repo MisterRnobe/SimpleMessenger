@@ -7,10 +7,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.eclipse.jetty.client.HttpClient;
 
 public class ApplicationStarter extends Application{
+    public static HttpClient httpClient;
     public void start(Stage primaryStage) throws Exception {
-
+        httpClient = new HttpClient();
+        httpClient.start();
         primaryStage.setResizable(false);
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("SignInWindow.fxml"));
 //        AnchorPane p = loader.load();
@@ -26,6 +29,10 @@ public class ApplicationStarter extends Application{
 
     @Override
     public void stop() {
-
+        try {
+            httpClient.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
