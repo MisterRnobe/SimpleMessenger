@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.window.main.MainWindow">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefWidth="220.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <VBox fx:id="chooserBox">
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+               <children>
+                  <AnchorPane prefHeight="24.0">
+                     <children>
+                        <Button mnemonicParsing="false" text="=" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="2.0" />
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+      <BorderPane fx:id="messageWindow" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <AnchorPane prefHeight="50.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" text="=" AnchorPane.bottomAnchor="13.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="12.0" />
+                  <Label fx:id="title" text="TITLE" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="info" text="INFO" textFill="#888888" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="25.0" />
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <ScrollPane fx:id="messagePane" fitToWidth="true" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <AnchorPane prefHeight="31.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" text="Отправить" AnchorPane.bottomAnchor="3.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="3.0" />
+                  <TextField fx:id="messageField" layoutX="3.0" layoutY="3.0" promptText="Не жалейте слов..." AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="78.0" AnchorPane.topAnchor="3.0" />
+               </children>
+            </AnchorPane>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

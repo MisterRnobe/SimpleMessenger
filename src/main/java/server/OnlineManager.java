@@ -1,10 +1,9 @@
 package server;
 
+import common.Response;
 import server.servlet.EventSocket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OnlineManager {
     private static final OnlineManager instance = new OnlineManager();
@@ -30,5 +29,9 @@ public class OnlineManager {
     public EventSocket getSocket(String login)
     {
         return online.get(login);
+    }
+    public void sendAll(Response response, String... logins)
+    {
+        Arrays.stream(logins).map(s -> online.get(s)).filter(Objects::nonNull).forEach(e->e.send(response));
     }
 }

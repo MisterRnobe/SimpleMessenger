@@ -1,41 +1,35 @@
 package server.servlet;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import common.Errors;
 import common.Methods;
 import common.Request;
+import common.Response;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import server.DatabaseConnector;
 import server.OnlineManager;
-import server.core.Authorization;
-import server.core.DialogCreator;
-import server.core.Message;
-import server.core.Response;
+import server.core.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class EventSocket extends WebSocketAdapter {
     private String login;
     private final Map<String, Function<Request, Response>> handlers = new HashMap<>();
-    {
-        System.out.println("START...");
-        handlers.put(Methods.AUTH, this::onAuth);
-        handlers.put(Methods.DIALOG_CREATION, DialogCreator::createConversation);
-        handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
-    }
+
+    //Handlers
+    private SendMessageHandler messageHandler;
+
 
     @Override
     public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
         System.out.println("CONNECTED!");
+        onStart();
     }
 
     @Override
@@ -62,28 +56,28 @@ public class EventSocket extends WebSocketAdapter {
         OnlineManager.getInstance().setOffline(login);
         System.out.println("CLOSED");
     }
-    private Response onAuth(Request request)
+    private Response onLogin(Request request)
     {
-        Response r = Authorization.auth(request);
+        Response r = new LoginHandler().handle(request);
         if (r.getStatus() == Response.OK)
         {
-            this.login = request.getBody().get("login");
+            this.login = request.getBody().getString("login");
             OnlineManager.getInstance().setOnline(login, this);
+            onLogin(login);
         }
         return r;
     }
     private Response onSendMessage(Request request)
     {
-        Response r = Message.sendMessage(request);
-        List<String> users = DatabaseConnector.getInstance().getUsersInDialog(r.getBody().get("dialog_id"));
+        Response r = this.messageHandler.handle(request);
+        List<String> users = DatabaseConnector.getInstance().getUsersInDialog(r.getBody().getString("dialogId"));
         if (users == null)
         {
             System.out.println("Нет пользователей в диалоге (Какая - то ошибка)!");
             return r;
         }
-        users.stream().map(s->OnlineManager.getInstance().getSocket(s))
-                .filter(socket -> Objects.nonNull(socket) && socket != this)
-                .forEach(socket -> socket.send(r));
+        users.remove(this.login);
+        OnlineManager.getInstance().sendAll(r, users.toArray(new String[0]));
         return r;
 
     }
@@ -94,5 +88,18 @@ public class EventSocket extends WebSocketAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private void onStart()
+    {
+        handlers.put(Methods.REGISTRATION, r->new RegistrationHandler().handle(r));
+        handlers.put(Methods.LOGIN, this::onLogin);
+    }
+    private void onLogin(String login)
+    {
+        handlers.clear();
+        this.messageHandler = new SendMessageHandler(login);
+        handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
+        handlers.put(Methods.DIALOG_CREATION, r -> new CreateDialogHandler(login).handle(r));
+        handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
     }
 }

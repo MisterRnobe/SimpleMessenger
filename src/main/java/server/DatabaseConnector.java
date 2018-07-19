@@ -2,6 +2,10 @@ package server;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import common.objects.Dialog;
+import common.objects.DialogInfo;
+import common.objects.DialogList;
+import common.objects.Message;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,24 +53,20 @@ public class DatabaseConnector {
             {this.put("login", login); this.put("password", password);}
         }, "users");
     }
-    public void addUser(Map<String, String> values)
+    public void addUser(String login, String password, String name, String email, String info)
     {
-        if (values.size() != 5)
-            throw new RuntimeException("Wrong number of user's fields.");
-        insert(values, "users");
-        insert(new TreeMap<String, String>(){{
-           this.put("login", values.get("login"));
-           this.put("last_online", Long.toString(System.currentTimeMillis()));
-           this.put("online", "0");
-        }}, "online");
+        insert(CustomMap.create()
+                .add("login", login)
+                .add("password", password)
+                .add("name", name)
+                .add("email", email)
+                .add("info", info), "users");
+        insert(CustomMap.create()
+                .add("login", login)
+                .add("last_online", Long.toString(System.currentTimeMillis()))
+                .add("online", "0"), "online");
     }
-    public void setToken(String login, String token)
-    {
-        insert(new TreeMap<String, String>(){{
-            this.put("login", login);
-            this.put("token", token);
-        }}, "tokens");
-    }
+
     public int createDialog(String creator, String partner)
     {
         int dialogId = insert(new TreeMap<String, String>(){{
@@ -85,21 +85,30 @@ public class DatabaseConnector {
         }}, "user_dialog");
         return dialogId;
     }
-    public String getUserToken(String login)
+    public DialogList getDialogs(String login, String count)
     {
-        try
+        DialogList dialogList = new DialogList();
+        try(Statement statement = connection.createStatement())
         {
-            Statement statement = connection.createStatement();
-            String query = "SELECT token from tokens WHERE login = "+wrapInQuotes(login)+";";
-            ResultSet resultSet = statement.executeQuery(query);
-            String result = resultSet.next()? resultSet.getString(1): null;
-            resultSet.close();
-            statement.close();
-            return result;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            String query = "SELECT d.dialog_id, d.dialog_name, d.creator, d.last_message_id, m.sender, m.text, m.time from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = "+wrapInQuotes(login)+" LIMIT "+count+";";
+            System.out.println(query);
+            try(ResultSet resultSet = statement.executeQuery(query))
+            {
+                while(resultSet.next())
+                {
+                    DialogInfo info = new DialogInfo(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
+                    Message m = new Message(resultSet.getInt(4), resultSet.getInt(1), resultSet.getString(5),
+                            resultSet.getString(6), resultSet.getLong(7));
+                    info.setLastMessage(m);
+                    dialogList.addDialog(info);
+                }
+            }
         }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return dialogList;
     }
     private int insert(Map<String, String> map, String table)
     {
@@ -118,22 +127,15 @@ public class DatabaseConnector {
               else
                   return -1;
             }
-//
-//            int id = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
-//            statement.close();
-//            return id;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
-    public boolean checkToken(String login, String token)
+    public Dialog getDialogById(int id)
     {
-        return checkExistence(new TreeMap<String, String>(){{
-            this.put("token", token);
-            this.put("login", login);
-        }}, "tokens");
+        return null;
     }
     public void setOnline(String login)
     {
@@ -198,20 +200,18 @@ public class DatabaseConnector {
     {
         update("dialog_id", dialogId, CustomMap.create().add("last_message_id", messageId), "dialogs");
     }
-    public int addMessage(String dialogId, String sender, String text)
+    public int addMessage(String dialogId, String sender, String text, String time)
     {
         return insert(CustomMap.create()
                 .add("sender", sender)
                 .add("dialog_id", dialogId)
                 .add("text",text)
-                .add("time",Long.toString(System.currentTimeMillis())),"messages");
+                .add("time",time),"messages");
     }
 
     public boolean checkUserExistence(String field, String value)
     {
-        return checkExistence(new TreeMap<String, String>(){
-            {this.put(field, value);}
-        }, "users");
+        return checkExistence(CustomMap.create().add(field, value), "users");
     }
     private String wrapInQuotes(String str)
     {

@@ -4,12 +4,21 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import common.Methods;
 import common.Request;
+import common.Response;
+import common.objects.DialogList;
+import common.objects.Message;
+import common.objects.requests.CreateDialogRequest;
+import common.objects.requests.DialogListRequest;
+import common.objects.requests.RegistrationData;
+import common.objects.requests.UserPasswordData;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import server.core.GetDialogsHandler;
 
 import java.net.URI;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
 
@@ -17,51 +26,31 @@ public class Starter {
     public static final String login = "nikita_medvedev";
     public static final String password = "123456";
     private static Session session;
-    public static void main(String[] args) throws Exception {
-        String token = auth();
-        connect(login, token);
-        session.getRemote().sendString(JSONObject.toJSONString(
-                sendMessage("8","Some text lol")
-        ));
-
-//        Request r = createDialog("nikita_medvedev", "Doroy");
-//        session.getRemote().sendString(JSON.toJSONString(r));
-//        for (int i = 0; i < 3; i++) {
-//            Request r = createDialog("nikita"+Integer.toString(i+1), "Hello("+Integer.toString(i)+")");
-//            session.getRemote().sendString(JSON.toJSONString(r));
-//        }
+    public static void main(String[] args) {
+        String json = "{\"body\":{\"dialogs\":[{\"creator\":\"nikita1\",\"dialogId\":8,\"lastMessage\":{\"dialogId\":8,\"messageId\":9,\"sender\":\"nikita_medvedev\",\"text\":\"Some text lol\",\"time\":1531062543919}},{\"creator\":\"nikita_medvedev\",\"dialogId\":9,\"lastMessage\":{\"dialogId\":9,\"messageId\":11,\"sender\":\"nikita_medvedev\",\"text\":\"Tectum\",\"time\":1531912106765}}]},\"code\":0,\"status\":0,\"type\":\"get_dialogs\"}";
+        JSONObject o = JSON.parseObject(json);
+        Response r = o.toJavaObject(Response.class);
+       // List<?> list = JSON.parseObject(r.getBody().toString(), List.class);
+        System.out.println(o.getString("body"));
 
 
     }
-    public static String auth() throws Exception {
-        String url = "http://localhost:200/login/";//"http://nikitamedvedev.ddns.net";
-        HttpClient httpClient = new HttpClient();
-        httpClient.start();
-        ContentResponse response = httpClient.POST(url)
-                .param("login", login)
-                .param("password", password)
-                .send();
-        //System.out.println(response.getContentAsString());
-        JSONObject o = JSON.parseObject(response.getContentAsString());
-        String token = o.getJSONObject("body").getString("token");//.get("token");
-        httpClient.stop();
-        return token;
+    public static Request auth() {
+        UserPasswordData data = new UserPasswordData();
+        data.setLogin(login);
+        data.setPassword(password);
+        return new Request().setMethod(Methods.LOGIN).setBody(data.toJSONObject());
     }
-    public static void reg(String login, String mail) throws Exception {
-        String url = "http://localhost:200/reg/";//"http://nikitamedvedev.ddns.net";
-        HttpClient httpClient = new HttpClient();
-        httpClient.start();
-        ContentResponse response = httpClient.POST(url)
-                .param("login",login)
-                .param("password","123456")
-                .param("name","Nikita Medvedev")
-                .param("email",mail)
-                .param("info","Cool!")
-                .send();
-        System.out.println(response.getContentAsString());
-        httpClient.stop();
+    public static Request reg(String login, String mail) {
+        RegistrationData data = new RegistrationData();
+        data.setLogin(login);
+        data.setPassword("123456");
+        data.setName("Nikita");
+        data.setEmail(mail);
+        data.setInfo("123456");
+        return new Request().setMethod(Methods.REGISTRATION).setBody(data.toJSONObject());
     }
-    public static void connect(String login, String token)
+    public static void connect()
     {
         URI uri = URI.create("ws://localhost:200/connect/");
         WebSocketClient client = new WebSocketClient();
@@ -77,8 +66,6 @@ public class Starter {
                 // Wait for Connect
                 session = fut.get();
                 // Send a message
-                session.getRemote().sendString(JSON.toJSONString(new Request().setMethod(Methods.AUTH)
-                        .setBody(new TreeMap<String, String>(){{this.put("token", token);this.put("login", login);}})));
                 //session.getRemote().sendString(JSON.toJSONString(createDialog("nikita_medvedev", "Hi")));
                 // Close session
                 //session.close();
@@ -96,23 +83,25 @@ public class Starter {
     public static Request createDialog(String partner, String initMsg)
     {
         Request r = new Request();
-        r.setMethod(Methods.DIALOG_CREATION).setBody(new TreeMap<String, String>(){{
-            this.put("creator", login);
-            this.put("partner", partner);
-            this.put("initialMessage", initMsg);
-        }});
+        CreateDialogRequest dialogRequest = new CreateDialogRequest();
+        dialogRequest.setInitialMessage(initMsg);
+        dialogRequest.setPartner(partner);
+        r.setMethod(Methods.DIALOG_CREATION).setBody(dialogRequest.toJSONObject());
         return r;
     }
-    public static Request sendMessage(String dialogId, String text)
+    public static Request sendMessage(int dialogId, String text)
     {
         Request r = new Request();
-        r.setMethod(Methods.SEND_MESSAGE).setBody(
-                new TreeMap<String, String>(){{
-                    this.put("login", login);
-                    this.put("dialog_id", dialogId);
-                    this.put("text", text);
-                }}
-        );
+        Message m = new Message();
+        m.setDialogId(dialogId);
+        m.setText(text);
+        r.setMethod(Methods.SEND_MESSAGE).setBody(m.toJSONObject());
         return r;
+    }
+    static Request getDialogs(int count)
+    {
+        DialogListRequest request = new DialogListRequest();
+        request.setCount("10");
+        return new Request().setMethod(Methods.GET_DIALOGS).setBody(request.toJSONObject());
     }
 }

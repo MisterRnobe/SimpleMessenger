@@ -1,7 +1,9 @@
 package common;
 
+import common.objects.Body;
+
 public class Errors {
-    //Registration
+    //RegistrationHandler
     //Errors related to login
     public static final int SHORT_LOGIN = 0;
     public static final int LONG_LOGIN = 1;
@@ -26,7 +28,7 @@ public class Errors {
     //End registration
 
 
-    //Authorization
+    //AuthorizationHandler
     public static final int NOT_EXIST = 50;
     public static final int BAD_PASSWORD = 51;
 
@@ -34,6 +36,7 @@ public class Errors {
     //Common
     public static final int WRONG_REQUEST_PARAMETERS = 1000;
     public static final int INTERNAL_ERROR = 1001;
+    public static final int EMPTY_BODY = 1002;
 
 
 }

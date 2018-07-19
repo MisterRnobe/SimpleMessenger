@@ -1,10 +1,10 @@
 package common;
 
-import java.util.Map;
+import com.alibaba.fastjson.JSONObject;
 
 public class Request {
     private String method;
-    private Map<String, String> body;
+    private JSONObject body;
 
     public String getMethod() {
         return method;
@@ -15,11 +15,11 @@ public class Request {
         return this;
     }
 
-    public Map<String, String> getBody() {
+    public JSONObject getBody() {
         return body;
     }
 
-    public Request setBody(Map<String, String> body) {
+    public Request setBody(JSONObject body) {
         this.body = body;
         return this;
     }

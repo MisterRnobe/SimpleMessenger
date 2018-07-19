@@ -1,20 +1,19 @@
 package client;
 
-import client.initial.InitialWindowController;
+import client.application.ApplicationBank;
+import client.network.SocketConnection;
+import client.window.initial.InitialWindowController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.eclipse.jetty.client.HttpClient;
 
 public class ApplicationStarter extends Application{
-    public static HttpClient httpClient;
     public void start(Stage primaryStage) throws Exception {
-        httpClient = new HttpClient();
-        httpClient.start();
+        SocketConnection.connect();
         primaryStage.setResizable(false);
+        ApplicationBank.setStage(primaryStage);
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("SignInWindow.fxml"));
 //        AnchorPane p = loader.load();
         Parent p = InitialWindowController.create();
@@ -29,10 +28,6 @@ public class ApplicationStarter extends Application{
 
     @Override
     public void stop() {
-        try {
-            httpClient.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        SocketConnection.close();
     }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane fx:id="pane" maxHeight="60.0" onMouseClicked="#onMouseClicked" onMouseEntered="#onMouseEnter" onMouseExited="#onMouseExit" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.window.main.DialogChooserController">
+        <children>
+            <Label fx:id="login" text="Name" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
+            <Label fx:id="lastMessage" text="Last message" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0" />
+      <Circle fx:id="avatar" fill="#1f93ff00" layoutX="28.0" layoutY="27.0" radius="25.0" stroke="#e80707" strokeLineCap="ROUND" strokeType="INSIDE" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+        </children>
+        <cursor>
+            <Cursor fx:constant="HAND" />
+        </cursor>
+
+</AnchorPane>
