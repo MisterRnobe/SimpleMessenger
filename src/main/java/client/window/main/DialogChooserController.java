@@ -1,15 +1,16 @@
 package client.window.main;
 
+import client.application.ApplicationBank;
+import client.network.queries.GetDialogQuery;
+import common.objects.Dialog;
 import common.objects.DialogInfo;
 import javafx.scene.Parent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class DialogChooserController {
     private AnchorPane pane;
 
     private String stdColor;
+    private int dialogId;
 
 
     @FXML
@@ -58,27 +60,12 @@ public class DialogChooserController {
     @FXML
     private void onMouseClicked()
     {
-        //MainWindow.getInstance().showDialog(this);
+        MainWindowManager.getInstance().setDialog(dialogId);
     }
     public Parent getPane()
     {
         return pane;
     }
-//    private void setLinkedDialog(DialogController d)
-//    {
-//        this.linkedDialog = d;
-//        this.setTitle(d.getDialog().getTitle());
-//        this.setLastMessage(d.getDialog().getMessage().message);
-//        this.setAvatar();
-//    }
-//    private void setAvatar()
-//    {
-//        Image image = linkedDialog.getDialog().getImage().getImage();
-//        double radius = avatar.getRadius();
-//        avatar.setCenterX(radius);
-//        avatar.setCenterY(radius);
-//        avatar.setFill(new ImagePattern(image, 0,0, 2*radius, 2*radius,false));
-//    }
     public static DialogChooserController create(DialogInfo dialogInfo) throws IOException
     {
         FXMLLoader loader = new FXMLLoader(DialogChooserController.class.getResource("DialogChooser.fxml"));
@@ -87,15 +74,16 @@ public class DialogChooserController {
 
         controller.setLastMessage(dialogInfo.getLastMessage().getText());
         controller.setTitle(dialogInfo.getDialogName());
+        controller.dialogId = dialogInfo.getDialogId();
 
         return controller;
     }
-//    public void update()
-//    {
-//        this.linkedDialog.updateMessages();
-//        this.setLastMessage(linkedDialog.getDialog().getMessage().message);
-//    }
-//    public Parent getRoot(){return pane;}
-//    public DialogController getLinkedDialog() {return linkedDialog;}
+    public void update()
+    {
+        this.setLastMessage(ApplicationBank.getInstance().getDialogInfoById(dialogId).getLastMessage().getText());
+    }
 
+    public int getDialogId() {
+        return dialogId;
+    }
 }

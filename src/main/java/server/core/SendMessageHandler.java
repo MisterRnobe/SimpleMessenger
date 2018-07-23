@@ -16,6 +16,7 @@ public class SendMessageHandler extends AbstractHandler<Message>{
         long time = System.currentTimeMillis();
         int messageId = DatabaseConnector.getInstance().addMessage(dialogId, login, text, Long.toString(time));
         DatabaseConnector.getInstance().setLastMessage(dialogId, Integer.toString(messageId));
+        body.setSender(login);
         body.setMessageId(messageId);
         body.setTime(time);
         return body;

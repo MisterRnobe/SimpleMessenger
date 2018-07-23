@@ -13,7 +13,7 @@ public class ApplicationStarter extends Application{
     public void start(Stage primaryStage) throws Exception {
         SocketConnection.connect();
         primaryStage.setResizable(false);
-        ApplicationBank.setStage(primaryStage);
+        ApplicationBank.getInstance().setStage(primaryStage);
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("SignInWindow.fxml"));
 //        AnchorPane p = loader.load();
         Parent p = InitialWindowController.create();

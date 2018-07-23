@@ -1,7 +1,6 @@
 package client.network;
 
-import client.network.queries.AuthorizationQuery;
-import client.network.queries.GetDialogsQuery;
+import client.network.queries.*;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
@@ -23,6 +22,9 @@ public class ClientSocket extends WebSocketAdapter {
     {
         handlers.put(Methods.LOGIN, AuthorizationQuery::onHandle);
         handlers.put(Methods.GET_DIALOGS, GetDialogsQuery::onHandle);
+        handlers.put(Methods.GET_DIALOG, GetDialogQuery::onHandle);
+        handlers.put(Methods.SEND_MESSAGE, SendMessageQuery::onHandle);
+        handlers.put(Methods.GET_USER_STATUS, GetUserStatusQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {

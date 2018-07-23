@@ -12,7 +12,12 @@ public class GetDialogsHandler extends AbstractHandler<DialogListRequest> {
 
     @Override
     protected Body onHandle(DialogListRequest body) throws HandleError {
-        return DatabaseConnector.getInstance().getDialogs(login, body.getCount());
+        DialogList dialogList = DatabaseConnector.getInstance().getDialogs(login, body.getCount());
+        dialogList.getDialogs().forEach(d->{
+            String anotherLogin = d.getUsers().stream().filter(s -> !s.equals(login)).findAny().get();
+            d.setDialogName(DatabaseConnector.getInstance().getUser(anotherLogin).getName());
+        });
+        return dialogList;
     }
 
 }

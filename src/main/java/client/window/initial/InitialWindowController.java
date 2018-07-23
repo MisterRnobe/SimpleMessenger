@@ -2,7 +2,6 @@ package client.window.initial;
 
 import client.application.ControllerLoader;
 import client.network.queries.AuthorizationQuery;
-import client.window.main.MainWindowStarter;
 import client.window.registration.RegistrationController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -10,9 +9,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.io.*;
 
 
 public class InitialWindowController {
@@ -25,13 +22,36 @@ public class InitialWindowController {
     private Label errorLabel;
 
 
-
+    @FXML
+    private void initialize()
+    {
+        File file = new File("login.txt");
+        if (file.exists())
+        {
+            try(BufferedReader r = new BufferedReader(new FileReader(file)))
+            {
+                String login = r.readLine();
+                String pass = r.readLine();
+                this.login.setText(login);
+                this.password.setText(pass);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @FXML
     private void onSignIn()
     {
         try {
             AuthorizationQuery.sendLoginAndPassword(login.getText(), password.getText());
+            if (remember.isSelected())
+            {
+                try(BufferedWriter w = new BufferedWriter(new FileWriter("login.txt")))
+                {
+                    w.write(login.getText()+"\n"+password.getText());
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

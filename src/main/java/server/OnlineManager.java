@@ -34,4 +34,8 @@ public class OnlineManager {
     {
         Arrays.stream(logins).map(s -> online.get(s)).filter(Objects::nonNull).forEach(e->e.send(response));
     }
+    public boolean isOnline(String login)
+    {
+        return online.get(login) != null;
+    }
 }

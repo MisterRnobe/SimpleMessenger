@@ -101,5 +101,7 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
         handlers.put(Methods.DIALOG_CREATION, r -> new CreateDialogHandler(login).handle(r));
         handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
+        handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
+        handlers.put(Methods.GET_USER_STATUS, r-> new GetUserStatusHandler().handle(r));
     }
 }

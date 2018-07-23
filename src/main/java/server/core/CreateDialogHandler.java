@@ -33,7 +33,7 @@ public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
         {
             int messageId = DatabaseConnector.getInstance().addMessage(Integer.toString(dialogId), creator, initialMessage, Long.toString(System.currentTimeMillis()));
             DatabaseConnector.getInstance().setLastMessage(Integer.toString(dialogId), Integer.toString(messageId));
-            return DatabaseConnector.getInstance().getDialogById(dialogId);
+            return DatabaseConnector.getInstance().getDialogById(Integer.toString(dialogId));
         }
     }
 }
