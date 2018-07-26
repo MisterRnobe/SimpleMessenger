@@ -11,9 +11,7 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class ClientSocket extends WebSocketAdapter {
     private static ClientSocket instance;
@@ -25,6 +23,7 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_DIALOG, GetDialogQuery::onHandle);
         handlers.put(Methods.SEND_MESSAGE, SendMessageQuery::onHandle);
         handlers.put(Methods.GET_USER_STATUS, GetUserStatusQuery::onHandle);
+        handlers.put(Methods.REGISTRATION, RegistrationQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {

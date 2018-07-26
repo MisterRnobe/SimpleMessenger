@@ -2,6 +2,7 @@ package client.network.queries;
 
 import client.application.ApplicationBank;
 import client.network.ClientSocket;
+import client.window.main.MainWindowManager;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
@@ -24,6 +25,7 @@ public class GetDialogQuery {
             Dialog dialog =
                     JSON.parseObject(response.getBody().toJSONString(), Dialog.class);
             ApplicationBank.getInstance().addDialog(dialog);
+            MainWindowManager.getInstance().setDialog(dialog.getDialogId());
         }
 
     }

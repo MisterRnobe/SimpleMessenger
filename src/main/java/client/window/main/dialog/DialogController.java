@@ -1,13 +1,13 @@
 package client.window.main.dialog;
 
 import client.application.ApplicationBank;
+import client.application.DialogBean;
 import client.application.Listener;
-import client.network.queries.GetUserStatusQuery;
 import client.network.queries.SendMessageQuery;
-import common.objects.Dialog;
 import common.objects.Message;
 import common.objects.User;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +20,9 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DialogController {
     @FXML
@@ -37,18 +40,6 @@ public class DialogController {
 
     private int dialogId;
 
-    private void initListener()
-    {
-        ApplicationBank b = ApplicationBank.getInstance();
-        ApplicationBank.getInstance().addUserStatusListener(new UserStatusListener());
-        try {
-            GetUserStatusQuery.sendQuery(
-                    ApplicationBank.getInstance().getDialogInfoById(dialogId).getPartners(ApplicationBank.getInstance().getLogin()).get(0)
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public Parent getRoot()
     {
@@ -60,29 +51,51 @@ public class DialogController {
         loader.load();
         return loader.getController();
     }
-    public static DialogController create(Dialog d) throws IOException {
+    public static DialogController create(int dialogId) throws IOException {
         DialogController controller = create();
-        controller.dialogId = d.getDialogId();
-        controller.title.setText(ApplicationBank.getInstance().getDialogInfoById(d.getDialogId()).getDialogName());
-        controller.addMessages(d.getMessages());
-        controller.initListener();
+        controller.bindDialog(dialogId);
         return controller;
     }
     private void addMessages(List<Message> messages) {
-        messages.forEach(m->{
-            try {
-                messageBox.getChildren().add(MessageController.create(m));
-            } catch (IOException e) {
-                e.printStackTrace();
+        messages.forEach(m->
+            Platform.runLater(()->{
+                try {
+                    messageBox.getChildren().add(MessageController.create(m));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }));
+    }
+    private void bindDialog(int dialogId)
+    {
+        this.dialogId = dialogId;
+        DialogBean dialogBean = ApplicationBank.getInstance().getDialogById(dialogId);
+        title.textProperty().bind(dialogBean.titleProperty());
+        addMessages(dialogBean.messages());
+
+        ApplicationBank.getInstance().addUserStatusListener(new UserStatusListener());
+//        messageWindow.parentProperty().addListener((observable, oldValue, newValue) -> {
+//            try {
+//                GetUserStatusQuery.sendQuery(
+//                        ApplicationBank.getInstance().getDialogById(dialogId)
+//                                .getPartners(ApplicationBank.getInstance().getLogin()).get(0)
+//                );
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+        dialogBean.messages().addListener((ListChangeListener<Message>) c -> {
+            while (c.next())
+            {
+                if (c.wasAdded()) {
+                    //WTF?!?
+                    List<Message> l = c.getAddedSubList().stream().map((Function<Message, Message>)m->m)
+                            .collect(Collectors.toList());
+                    addMessages(l);
+                }
             }
         });
-    }
-    public void update()
-    {
-        Dialog d = ApplicationBank.getInstance().getDialogById(dialogId);
-        int messageCount = messageBox.getChildren().size();
-        List<Message> list = d.getMessages().subList(messageCount, d.getMessages().size());
-        addMessages(list);
+
     }
     @FXML
     private void sendMessage()

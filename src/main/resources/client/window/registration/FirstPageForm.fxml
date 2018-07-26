@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="400.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.141"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.window.registration.FirstPageController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.window.registration.FirstPageController" fx:id="root">
    <VBox spacing="10.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="60.0">
       <AnchorPane>
          <Label text="Логин" AnchorPane.leftAnchor="0.0">
@@ -47,7 +47,7 @@
                   <Font size="16.0"/>
                </font>
             </Label>
-            <TextField fx:id="phoneNumber" prefWidth="150.0" promptText="Phone number" AnchorPane.rightAnchor="0.0"/>
+            <TextField fx:id="email" prefWidth="150.0" promptText="Адрес электронной почты" AnchorPane.rightAnchor="0.0"/>
          </children>
       </AnchorPane>
       <AnchorPane layoutX="10.0" layoutY="60.0">

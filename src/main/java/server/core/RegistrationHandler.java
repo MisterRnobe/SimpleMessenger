@@ -50,7 +50,7 @@ public class RegistrationHandler extends AbstractHandler<RegistrationData> {
     }
     private static void checkInfo(String info)
     {
-        if (info.length() > 150)
+        if (info != null && info.length() > 150)
             throw new HandleError(Errors.LONG_INFO);
     }
     private static boolean check(String str, String regex)

@@ -1,26 +1,18 @@
 package client.application;
 
-import client.window.main.dialog.DialogController;
 import common.objects.*;
+import javafx.collections.*;
 import javafx.stage.Stage;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ApplicationBank {
     private static final ApplicationBank instance = new ApplicationBank();
     private Stage stage;
-    private final List<DialogInfo> dialogs = new LinkedList<>();
-    private final List<Listener<DialogInfo>> dialogInfoListeners = new LinkedList<>();
+    private final ObservableMap<Integer, DialogBean> dialogs = FXCollections.observableHashMap();
 
-    private final Map<Integer, Dialog> dialogMap = new TreeMap<>();
-    private final List<Listener<Dialog>> dialogListeners = new LinkedList<>();
-
-    private final List<Listener<Message>> messageListeners = new LinkedList<>();
     private final Map<String, User> userMap = new TreeMap<>();
-
     private final List<Listener<User>> userStatusListeners = new LinkedList<>();
 
     private String login;
@@ -33,44 +25,27 @@ public class ApplicationBank {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    public void addDialogInfoListener(Listener<DialogInfo> listener)
-    {
-        dialogInfoListeners.add(listener);
-    }
     public void addDialogsInfo(DialogList list)
     {
         list.getDialogs().forEach(this::addDialogInfo);
     }
-    public void addDialogListener(Listener<Dialog> listener)
-    {
-        dialogListeners.add(listener);
-    }
     public void addDialog(Dialog d)
     {
-        dialogMap.put(d.getDialogId(), d);
-        d.getUsers().forEach(this::addUser);
-        dialogListeners.forEach(l->l.onHandle(d));
+        DialogBean dialogBean = dialogs.get(d.getDialogId());
+        dialogBean.setMessages(d.getMessages());
+        dialogBean.setUsers(d.getUsers().stream().map(User::getLogin).collect(Collectors.toList()));
+        d.getUsers().forEach(u->userMap.put(u.getLogin(), u));
     }
     public void addDialogInfo(DialogInfo dialogInfo)
     {
-        dialogs.add(dialogInfo);
-        dialogInfoListeners.forEach(listener -> listener.onHandle(dialogInfo));
+        DialogBean dialogBean = new DialogBean(dialogInfo.getDialogName(),
+                dialogInfo.getLastMessage(), dialogInfo.getDialogId());
+        dialogs.put(dialogBean.dialogId, dialogBean);
     }
     public void addMessage(Message message)
     {
-        DialogInfo dialogInfo = dialogs.stream().filter(d->d.getDialogId()==message.getDialogId()).findFirst().get();
-        dialogInfo.setLastMessage(message);
-
-        Dialog dialog = dialogMap.get(message.getDialogId());
-        if (dialog != null)
-        {
-            dialog.addMessage(message);
-        }
-        messageListeners.forEach(l->l.onHandle(message));
-    }
-    public void addMessageListener(Listener<Message> messageListener)
-    {
-        messageListeners.add(messageListener);
+        DialogBean bean = dialogs.get(message.getDialogId());
+        bean.setLastMessage(message);
     }
     public void addUser(User u)
     {
@@ -107,12 +82,12 @@ public class ApplicationBank {
     public void setLogin(String login) {
         this.login = login;
     }
-    public DialogInfo getDialogInfoById(int id)
+    public DialogBean getDialogById(int id)
     {
-        return dialogs.stream().filter(d->d.getDialogId() == id).findAny().get();
+        return dialogs.get(id);
     }
-    public Dialog getDialogById(int id)
+    public void addDialogListener(MapChangeListener<? super Integer, ? super DialogBean> listener)
     {
-        return dialogMap.get(id);
+        dialogs.addListener(listener);
     }
 }

@@ -1,9 +1,10 @@
 package client.window.main;
 
-import client.application.ApplicationBank;
-import client.network.queries.GetDialogQuery;
-import common.objects.Dialog;
-import common.objects.DialogInfo;
+import client.application.DialogBean;
+import common.objects.Message;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +18,7 @@ import java.io.IOException;
 
 public class DialogChooserController {
     @FXML
-    private Label login;
+    private Label title;
     @FXML
     private Label lastMessage;
     @FXML
@@ -37,13 +38,6 @@ public class DialogChooserController {
                 CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
-    private void setTitle(String title) {
-        this.login.setText(title);
-    }
-
-    private void setLastMessage(String lastMessage) {
-        this.lastMessage.setText(lastMessage);
-    }
     @FXML
     private void onMouseEnter()
     {
@@ -66,21 +60,22 @@ public class DialogChooserController {
     {
         return pane;
     }
-    public static DialogChooserController create(DialogInfo dialogInfo) throws IOException
+    public static DialogChooserController create(DialogBean dialogInfo) throws IOException
     {
         FXMLLoader loader = new FXMLLoader(DialogChooserController.class.getResource("DialogChooser.fxml"));
         loader.load();
         DialogChooserController controller = loader.getController();
-
-        controller.setLastMessage(dialogInfo.getLastMessage().getText());
-        controller.setTitle(dialogInfo.getDialogName());
-        controller.dialogId = dialogInfo.getDialogId();
-
+        controller.bindDialog(dialogInfo);
         return controller;
     }
-    public void update()
+    private void bindDialog(DialogBean dialogBean)
     {
-        this.setLastMessage(ApplicationBank.getInstance().getDialogInfoById(dialogId).getLastMessage().getText());
+        title.textProperty().bind(dialogBean.titleProperty());
+        dialogBean.lastMessageProperty().addListener((observable, oldValue, newValue) ->
+                Platform.runLater(()->lastMessage.setText(newValue.getText())));
+        lastMessage.setText(dialogBean.lastMessageProperty().getValue().getText());
+        dialogId = dialogBean.dialogId;
+
     }
 
     public int getDialogId() {

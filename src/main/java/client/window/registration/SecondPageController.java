@@ -49,7 +49,7 @@ public class SecondPageController {
         WritableImage wi = new WritableImage(reader, (int)d[0], (int)d[1], (int)d[2], (int) d[2] );
 
         BufferedImage bi = SwingFXUtils.fromFXImage(wi, null);
-        RegistrationController.finish();
+        //RegistrationController.finish();
         //RegistrationController.getQuery().setAvatar(TransmittableImage.createFrom(bi));
         //RegistrationHandler.enableThirdPage();
     }
