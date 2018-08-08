@@ -47,6 +47,12 @@ public class MessageController {
             box.setAlignment(Pos.BASELINE_RIGHT);
             vBox.setAlignment(Pos.TOP_LEFT);
         }
+        else if (m.getSender().equals("null"))
+        {
+            vBox.getChildren().remove(userLabel);
+            box.setAlignment(Pos.BASELINE_CENTER);
+            vBox.setAlignment(Pos.CENTER);
+        }
         else
         {
             User u = ApplicationBank.getInstance().getUserByLogin(m.getSender());

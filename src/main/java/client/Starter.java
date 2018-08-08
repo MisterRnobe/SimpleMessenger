@@ -5,21 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import common.Methods;
 import common.Request;
 import common.Response;
-import common.objects.DialogList;
 import common.objects.Message;
-import common.objects.requests.CreateDialogRequest;
-import common.objects.requests.DialogListRequest;
-import common.objects.requests.RegistrationData;
-import common.objects.requests.UserPasswordData;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
+import common.objects.requests.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import server.core.GetDialogsHandler;
 
 import java.net.URI;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.LinkedList;
 import java.util.concurrent.Future;
 
 public class Starter {
@@ -27,11 +19,13 @@ public class Starter {
     public static final String password = "123456";
     private static Session session;
     public static void main(String[] args) {
-        String json = "{\"body\":{\"dialogs\":[{\"creator\":\"nikita1\",\"dialogId\":8,\"lastMessage\":{\"dialogId\":8,\"messageId\":9,\"sender\":\"nikita_medvedev\",\"text\":\"Some text lol\",\"time\":1531062543919}},{\"creator\":\"nikita_medvedev\",\"dialogId\":9,\"lastMessage\":{\"dialogId\":9,\"messageId\":11,\"sender\":\"nikita_medvedev\",\"text\":\"Tectum\",\"time\":1531912106765}}]},\"code\":0,\"status\":0,\"type\":\"get_dialogs\"}";
-        JSONObject o = JSON.parseObject(json);
-        Response r = o.toJavaObject(Response.class);
-       // List<?> list = JSON.parseObject(r.getBody().toString(), List.class);
-        System.out.println(o.getString("body"));
+        CreateGroupRequest r = new CreateGroupRequest();
+        r.setTitle("abc");
+        r.setPartners(new LinkedList<>());
+        r.addPartner("loh");
+        r.addPartner("pidor");
+        JSONObject o = r.toJSONObject();
+        System.out.println(o.toJSONString());
 
 
     }
@@ -48,7 +42,7 @@ public class Starter {
         data.setName("Nikita");
         data.setEmail(mail);
         data.setInfo("123456");
-        return new Request().setMethod(Methods.REGISTRATION).setBody(data.toJSONObject());
+        return new Request().setMethod(Methods.REGISTER).setBody(data.toJSONObject());
     }
     public static void connect()
     {
@@ -86,7 +80,7 @@ public class Starter {
         CreateDialogRequest dialogRequest = new CreateDialogRequest();
         dialogRequest.setInitialMessage(initMsg);
         dialogRequest.setPartner(partner);
-        r.setMethod(Methods.DIALOG_CREATION).setBody(dialogRequest.toJSONObject());
+        r.setMethod(Methods.CREATE_DIALOG).setBody(dialogRequest.toJSONObject());
         return r;
     }
     public static Request sendMessage(int dialogId, String text)

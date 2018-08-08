@@ -30,9 +30,9 @@ public class OnlineManager {
     {
         return online.get(login);
     }
-    public void sendAll(Response response, String... logins)
+    public void sendAll(Response response, Collection<String> logins)
     {
-        Arrays.stream(logins).map(s -> online.get(s)).filter(Objects::nonNull).forEach(e->e.send(response));
+        logins.stream().map(s -> online.get(s)).filter(Objects::nonNull).forEach(e->e.send(response));
     }
     public boolean isOnline(String login)
     {

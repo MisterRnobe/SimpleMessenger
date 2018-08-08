@@ -3,6 +3,8 @@ package client.window.main;
 import client.application.DialogBean;
 import common.objects.Message;
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
@@ -15,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 public class DialogChooserController {
     @FXML
@@ -28,6 +31,7 @@ public class DialogChooserController {
 
     private String stdColor;
     private int dialogId;
+    private BiConsumer<DialogChooserController, Message> onNewMessage = (d,m)->{};
 
 
     @FXML
@@ -72,12 +76,18 @@ public class DialogChooserController {
     {
         title.textProperty().bind(dialogBean.titleProperty());
         dialogBean.lastMessageProperty().addListener((observable, oldValue, newValue) ->
-                Platform.runLater(()->lastMessage.setText(newValue.getText())));
+                Platform.runLater(()->{
+                    lastMessage.setText(newValue.getText());
+                    onNewMessage.accept(this, newValue);
+                }));
         lastMessage.setText(dialogBean.lastMessageProperty().getValue().getText());
         dialogId = dialogBean.dialogId;
 
     }
-
+    public void setOnMessageReceived(BiConsumer<DialogChooserController, Message> consumer)
+    {
+        this.onNewMessage = consumer;
+    }
     public int getDialogId() {
         return dialogId;
     }

@@ -1,19 +1,23 @@
 package common.objects;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DialogInfo {
+    public static final int DIALOG = 0;
+    public static final int GROUP = 1;
+    public static final int CHANNEL = 2;
     private int dialogId;
+    private int type;
     private String dialogName;
     private String creator;
     private Message lastMessage;
-    private List<String> users;
+    private List<User> users;
 
-    public DialogInfo(int dialogId, String dialogName, String creator) {
+    public DialogInfo(int dialogId, String dialogName, String creator, int type) {
         this.dialogId = dialogId;
         this.dialogName = dialogName;
         this.creator = creator;
+        this.type = type;
     }
     public DialogInfo(){}
 
@@ -23,6 +27,14 @@ public class DialogInfo {
 
     public String getDialogName() {
         return dialogName;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getCreator() {
@@ -41,14 +53,14 @@ public class DialogInfo {
         this.creator = creator;
     }
 
-    public List<String> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<String> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
-    public void addUser(String user)
+    public void addUser(User user)
     {
         users.add(user);
     }
@@ -59,9 +71,5 @@ public class DialogInfo {
 
     public void setLastMessage(Message lastMessage) {
         this.lastMessage = lastMessage;
-    }
-    public List<String> getPartners(String login)
-    {
-        return users.stream().filter(s->!s.equals(login)).collect(Collectors.toList());
     }
 }

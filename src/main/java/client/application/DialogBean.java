@@ -9,21 +9,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DialogBean {
     private final ReadOnlyStringWrapper title;
     private final ReadOnlyObjectWrapper<Message> lastMessage;
     private final ObservableList<String> users;
     private final ObservableList<Message> messages;
+    public final int type;
     public final int dialogId;
 
-    DialogBean(String title, Message lastMessage, int dialogId)
+    DialogBean(String title, Message lastMessage, int type, int dialogId)
     {
         this.title = new ReadOnlyStringWrapper(this, "title", title);
         this.lastMessage = new ReadOnlyObjectWrapper<>(this, "lastMessage", lastMessage);
         this.users = FXCollections.observableArrayList();
         this.messages = FXCollections.observableArrayList();
         this.dialogId = dialogId;
+        this.type = type;
     }
     void setUsers(List<String> users)
     {
@@ -36,7 +39,7 @@ public class DialogBean {
     void setLastMessage(Message message)
     {
         this.lastMessage.set(message);
-        if (messages != null)
+        if (messages.size() != 0)
         {
             messages.add(message);
         }
@@ -56,5 +59,10 @@ public class DialogBean {
     public ObservableList<Message> messages()
     {
         return messages;
+    }
+    public List<String> getPartners()
+    {
+        return users.stream().filter(s->!s.equalsIgnoreCase(ApplicationBank.getInstance().getLogin()))
+                .collect(Collectors.toList());
     }
 }

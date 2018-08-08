@@ -4,6 +4,8 @@ import client.application.ApplicationBank;
 import client.application.DialogBean;
 import client.network.queries.GetDialogQuery;
 import client.network.queries.GetDialogsQuery;
+import client.window.main.dialog.controllers.NewDialogWrapper;
+import common.objects.User;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -45,6 +47,21 @@ public class MainWindowManager {
 
     public static void start(){
         instance = new MainWindowManager();
+
+    }
+    public void closeWindow()
+    {
+        mainWindowController.closeWindow();;
+    }
+    public void createEmptyDialog(User u)
+    {
+        mainWindowController.closeWindow();
+        try {
+            NewDialogWrapper wrapper = new NewDialogWrapper(u);
+            mainWindowController.showDialog(wrapper.getRoot());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
     public void setDialog(int dialogId)

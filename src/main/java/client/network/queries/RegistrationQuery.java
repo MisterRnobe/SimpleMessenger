@@ -19,7 +19,7 @@ public class RegistrationQuery {
         data.setName(name);
         data.setEmail(email);
         data.setInfo(info);
-        Request r = new Request().setMethod(Methods.REGISTRATION).setBody(data.toJSONObject());
+        Request r = new Request().setMethod(Methods.REGISTER).setBody(data.toJSONObject());
         ClientSocket.getInstance().send(r);
     }
 

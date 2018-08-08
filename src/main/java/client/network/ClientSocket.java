@@ -23,7 +23,10 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_DIALOG, GetDialogQuery::onHandle);
         handlers.put(Methods.SEND_MESSAGE, SendMessageQuery::onHandle);
         handlers.put(Methods.GET_USER_STATUS, GetUserStatusQuery::onHandle);
-        handlers.put(Methods.REGISTRATION, RegistrationQuery::onHandle);
+        handlers.put(Methods.REGISTER, RegistrationQuery::onHandle);
+        handlers.put(Methods.FIND_USERS, FindUsersQuery::onHandle);
+        handlers.put(Methods.CREATE_DIALOG, CreateDialogQuery::onHandle);
+        handlers.put(Methods.CREATE_GROUP, CreateDialogQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {
