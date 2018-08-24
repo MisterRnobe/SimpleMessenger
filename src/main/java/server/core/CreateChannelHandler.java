@@ -5,15 +5,14 @@ import common.objects.Body;
 import common.objects.requests.CreateGroupRequest;
 import server.DatabaseConnector;
 
-public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
-
-    public CreateGroupHandler(String login) {
+public class CreateChannelHandler extends AbstractHandler<CreateGroupRequest>{
+    public CreateChannelHandler(String login) {
         super(CreateGroupRequest.class, new String[]{"title", "partners"}, login);
     }
 
     @Override
     protected Body onHandle(CreateGroupRequest body) throws HandleError {
-        int dialogId = DatabaseConnector.getInstance().createGroup(login, body.getTitle(), body.getPartners());
+        int dialogId = DatabaseConnector.getInstance().createChannel(login, body.getTitle(), body.getPartners());
         if (dialogId == -1)
             throw new HandleError(Errors.INTERNAL_ERROR);
         else

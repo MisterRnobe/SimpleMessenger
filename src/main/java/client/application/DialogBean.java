@@ -18,8 +18,9 @@ public class DialogBean {
     private final ObservableList<Message> messages;
     public final int type;
     public final int dialogId;
+    public final String creator;
 
-    DialogBean(String title, Message lastMessage, int type, int dialogId)
+    DialogBean(String title, Message lastMessage, String creator, int type, int dialogId)
     {
         this.title = new ReadOnlyStringWrapper(this, "title", title);
         this.lastMessage = new ReadOnlyObjectWrapper<>(this, "lastMessage", lastMessage);
@@ -27,6 +28,7 @@ public class DialogBean {
         this.messages = FXCollections.observableArrayList();
         this.dialogId = dialogId;
         this.type = type;
+        this.creator = creator;
     }
     void setUsers(List<String> users)
     {

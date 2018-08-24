@@ -5,6 +5,7 @@ import client.application.DialogBean;
 import client.network.queries.GetDialogQuery;
 import client.network.queries.GetDialogsQuery;
 import client.window.main.dialog.controllers.NewDialogWrapper;
+import client.window.main.menu.AbstractWindow;
 import common.objects.User;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -51,7 +52,11 @@ public class MainWindowManager {
     }
     public void closeWindow()
     {
-        mainWindowController.closeWindow();;
+        mainWindowController.closeWindow();
+    }
+    public void displayWindow(AbstractWindow w)
+    {
+        mainWindowController.displayWindow(()->w);
     }
     public void createEmptyDialog(User u)
     {

@@ -26,7 +26,6 @@ public class EventSocket extends WebSocketAdapter {
 
     //Handlers
     private SendMessageHandler messageHandler;
-    private CreateDialogHandler createDialogHandler;
 
 
     @Override
@@ -74,7 +73,7 @@ public class EventSocket extends WebSocketAdapter {
     private Response onSendMessage(Request request)
     {
         Response r = this.messageHandler.handle(request);
-        List<String> users = DatabaseConnector.getInstance().getUsersInDialog(r.getBody().getString("dialogId")).
+        List<String> users = DatabaseConnector.getInstance().getUsersInDialog(r.getBody().getInteger("dialogId")).
                 stream().map(User::getLogin).collect(Collectors.toList());
         if (users.size() == 0)
         {
@@ -122,9 +121,10 @@ public class EventSocket extends WebSocketAdapter {
     {
         handlers.clear();
         this.messageHandler = new SendMessageHandler(login);
-        this.createDialogHandler = new CreateDialogHandler(login);
+
         handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
-        handlers.put(Methods.CREATE_DIALOG, r-> this.onCreateDialog(r, createDialogHandler));
+        handlers.put(Methods.CREATE_DIALOG, r-> this.onCreateDialog(r, new CreateDialogHandler(login)));
+        handlers.put(Methods.CREATE_CHANNEL, r -> this.onCreateDialog(r, new CreateChannelHandler(login)));
         handlers.put(Methods.CREATE_GROUP, r-> this.onCreateDialog(r, new CreateGroupHandler(login)));
         handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
         handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));

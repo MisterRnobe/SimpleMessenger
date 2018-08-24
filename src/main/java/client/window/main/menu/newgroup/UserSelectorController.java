@@ -41,6 +41,14 @@ public class UserSelectorController {
     {
         return root;
     }
+    public String getName()
+    {
+        return name.getText();
+    }
+    public String getLogin()
+    {
+        return login.getText();
+    }
 
     public static UserSelectorController create(User user) throws IOException {
         FXMLLoader loader = new FXMLLoader(UserSelectorController.class.getResource("UserSelector.fxml"));

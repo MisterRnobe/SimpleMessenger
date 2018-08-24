@@ -2,6 +2,7 @@ package client.window.main.dialog.controllers;
 
 import client.application.ApplicationBank;
 import client.application.DialogBean;
+import client.window.main.dialog.info.GroupInfoController;
 
 import java.io.IOException;
 
@@ -16,6 +17,7 @@ public class GroupWrapper extends AbstractWrapper {
         dialogController.getInfo().setText(dialogBean.getPartners().size()+1 +" человек(а)");
         dialogController.getTitle().setText(dialogBean.titleProperty().getValue());
         bindMessages(dialogBean);
+        dialogController.setInfoWindow(()->GroupInfoController.create(dialogId));
     }
 
 }

@@ -1,6 +1,8 @@
 package client.window.main.dialog;
 
 import client.application.ApplicationBank;
+import client.application.DialogBean;
+import common.objects.DialogInfo;
 import common.objects.Message;
 import common.objects.User;
 import javafx.fxml.FXML;
@@ -20,7 +22,7 @@ public class MessageController {
     @FXML
     private Label msgLabel;
     @FXML
-    private Label userLabel;
+    private Label senderLabel;
     @FXML
     private Label timeLabel;
     @FXML
@@ -41,24 +43,34 @@ public class MessageController {
         this.message = m;
         msgLabel.setText(message.getText());
         timeLabel.setText(String.format("%tR", new Date(m.getTime())));
-        if (m.getSender().equals(ApplicationBank.getInstance().getLogin()))
+        if (m.getIsSystem())
         {
-            vBox.getChildren().remove(userLabel);
-            box.setAlignment(Pos.BASELINE_RIGHT);
-            vBox.setAlignment(Pos.TOP_LEFT);
-        }
-        else if (m.getSender().equals("null"))
-        {
-            vBox.getChildren().remove(userLabel);
+            vBox.getChildren().remove(senderLabel);
             box.setAlignment(Pos.BASELINE_CENTER);
             vBox.setAlignment(Pos.CENTER);
         }
+
+        else if (m.getSender().equals(ApplicationBank.getInstance().getLogin()))
+        {
+            vBox.getChildren().remove(senderLabel);
+            box.setAlignment(Pos.BASELINE_RIGHT);
+            vBox.setAlignment(Pos.TOP_LEFT);
+        }
         else
         {
-            User u = ApplicationBank.getInstance().getUserByLogin(m.getSender());
-            userLabel.setText(u.getName()+" :");
             box.setAlignment(Pos.BASELINE_LEFT);
             vBox.setAlignment(Pos.TOP_LEFT);
+            DialogBean b = ApplicationBank.getInstance().getDialogById(m.getDialogId());
+            if (b.type == DialogInfo.DIALOG)
+                vBox.getChildren().remove(senderLabel);
+            else if (b.type == DialogInfo.GROUP) {
+                User u = ApplicationBank.getInstance().getUserByLogin(m.getSender());
+                senderLabel.setText(u.getName()+" :");
+            }
+            else
+            {
+                senderLabel.setText(b.titleProperty().getValue()+" :");
+            }
         }
 
     }

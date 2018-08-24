@@ -7,8 +7,10 @@ import common.Request;
 import common.Response;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import server.core.CreateChannelHandler;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -27,6 +29,7 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.FIND_USERS, FindUsersQuery::onHandle);
         handlers.put(Methods.CREATE_DIALOG, CreateDialogQuery::onHandle);
         handlers.put(Methods.CREATE_GROUP, CreateDialogQuery::onHandle);
+        handlers.put(Methods.CREATE_CHANNEL, CreateDialogQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {

@@ -1,7 +1,7 @@
 package client.window.main.menu.newdialog;
 
 import client.network.queries.FindUsersQuery;
-import client.window.main.menu.AbstractMenuWindow;
+import client.window.main.menu.AbstractWindow;
 import common.objects.UserList;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -12,9 +12,7 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
-public class UserSearchController extends AbstractMenuWindow {
-    @FXML
-    private AnchorPane root;
+public class UserSearchController extends AbstractWindow {
     @FXML
     private TextField textField;
     @FXML
@@ -50,11 +48,6 @@ public class UserSearchController extends AbstractMenuWindow {
                 e.printStackTrace();
             }
         });
-    }
-
-    public AnchorPane getRoot()
-    {
-        return root;
     }
     public static UserSearchController create() throws IOException
     {

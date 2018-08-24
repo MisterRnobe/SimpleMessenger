@@ -31,6 +31,16 @@ public class CreateDialogQuery {
         ClientSocket.getInstance().send(new Request().setMethod(Methods.CREATE_GROUP).setBody(r.toJSONObject()));
         sent++;
     }
+    public static void sendChannelQuery(String title, List<String> partners) throws IOException
+    {
+        CreateGroupRequest r = new CreateGroupRequest();
+        r.setTitle(title);
+        r.setPartners(partners);
+        ClientSocket.getInstance().send(
+                new Request().setMethod(Methods.CREATE_CHANNEL).setBody(r.toJSONObject())
+        );
+        sent++;
+    }
     public static void onHandle(Response response)
     {
         if (response.getStatus() == Response.OK) {

@@ -22,12 +22,4 @@ public class CreateDialogRequest extends Body {
     public void setInitialMessage(String initialMessage) {
         this.initialMessage = initialMessage;
     }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject();
-        o.put("partner", partner);
-        o.put("initialMessage", initialMessage);
-        return o;
-    }
 }

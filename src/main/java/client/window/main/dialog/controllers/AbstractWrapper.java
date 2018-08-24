@@ -10,6 +10,7 @@ import common.objects.Message;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
@@ -44,7 +45,7 @@ public abstract class AbstractWrapper {
                     }
         });
     }
-    public Parent getRoot()
+    public Pane getRoot()
     {
         return dialogController.getMessageWindow();
     }
@@ -67,6 +68,8 @@ public abstract class AbstractWrapper {
             return new DialogWrapper(dialogId);
         else if (type == DialogInfo.GROUP)
             return new GroupWrapper(dialogId);
-        return null;
+        else if (type == DialogInfo.CHANNEL)
+            return new ChannelWrapper(dialogId);
+        throw new RuntimeException("Wrong dialog type!");
     }
 }

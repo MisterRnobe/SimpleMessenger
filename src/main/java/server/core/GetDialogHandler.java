@@ -11,6 +11,6 @@ public class GetDialogHandler extends AbstractHandler<DialogRequest>{
 
     @Override
     protected Body onHandle(DialogRequest body) throws HandleError {
-        return DatabaseConnector.getInstance().getDialogById(Integer.toString(body.getDialogId()));
+        return DatabaseConnector.getInstance().getDialogById(body.getDialogId());
     }
 }

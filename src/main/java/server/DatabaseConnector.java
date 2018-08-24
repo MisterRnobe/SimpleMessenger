@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DatabaseConnector {
@@ -84,6 +86,25 @@ public class DatabaseConnector {
                 ));
         return dialogId;
     }
+    public int createChannel(String creator, String title, List<String> partners)
+    {
+        int dialogId = insert(CustomMap.create()
+                .add("dialog_name", title)
+                .add("creator", creator)
+                .add("type", Integer.toString(DialogInfo.CHANNEL)), "dialogs");
+        if (dialogId == -1)
+            return dialogId;
+        insert(CustomMap.create()
+                .add("login", creator)
+                .add("dialog_id", Integer.toString(dialogId)),
+                "user_dialog");
+        partners.forEach(s->
+                insert(CustomMap.create()
+                                .add("login", s)
+                                .add("dialog_id", Integer.toString(dialogId)),
+                        "user_dialog"));
+        return dialogId;
+    }
 
     public int createDialog(String creator, String partner)
     {
@@ -100,7 +121,7 @@ public class DatabaseConnector {
                 .add("dialog_id", Integer.toString(dialogId)), "user_dialog");
         return dialogId;
     }
-    public List<User> getUsersInDialog(String dialogId)
+    public List<User> getUsersInDialog(Integer dialogId)
     {
         List<User> users = new LinkedList<>();
         try(Statement statement = connection.createStatement())
@@ -154,15 +175,16 @@ public class DatabaseConnector {
         DialogList dialogList = new DialogList();
         try(Statement statement = connection.createStatement())
         {
-            String query = "SELECT d.dialog_id, d.dialog_name, d.creator, d.last_message_id, d.type, m.sender, m.text, m.time from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = "+wrapInQuotes(login)+" LIMIT "+count+";";
+            String query = "SELECT d.dialog_id as dialog_id, d.dialog_name, d.creator, d.last_message_id as message_id, d.type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = "+wrapInQuotes(login)+" LIMIT "+count+";";
             System.out.println(query);
             try(ResultSet resultSet = statement.executeQuery(query))
             {
+
                 while(resultSet.next())
                 {
+                    System.out.println("RESULT: "+resultSet.getString("m.text"));
                     DialogInfo info = new DialogInfo(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(5));
-                    Message m = new Message(resultSet.getInt(4), resultSet.getInt(1), resultSet.getString(6),
-                            resultSet.getString(7), resultSet.getLong(8));
+                    Message m = buildMessage(resultSet);
                     info.setLastMessage(m);
                     dialogList.addDialog(info);
                 }
@@ -172,10 +194,7 @@ public class DatabaseConnector {
         {
             e.printStackTrace();
         }
-        dialogList.getDialogs().forEach(d->{
-            String id = Integer.toString(d.getDialogId());
-            d.setUsers(getUsersInDialog(id));
-        });
+        dialogList.getDialogs().forEach(d-> d.setUsers(getUsersInDialog(d.getDialogId())));
         return dialogList;
     }
     private int insert(Map<String, String> map, String table)
@@ -201,21 +220,35 @@ public class DatabaseConnector {
     }
     public User getUserStatus(String login)
     {
-        User u = new User();
+        return executeSelect("SELECT last_online FROM online WHERE login = " + wrapInQuotes(login) + ";",
+                resultSet -> {
+                    User u = new User();
+                    try {
+                        if (resultSet.next())
+                        {
+                            u.setLastOnline(resultSet.getLong(1));
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return u;
+                });
+    }
+    private <E> E executeSelect(String query, Function<ResultSet, E> consumer)
+    {
+        E result = null;
+        System.out.println(query);
         try(Statement statement = connection.createStatement())
         {
-            String query = "SELECT last_online FROM online WHERE login = "+wrapInQuotes(login)+";";
             try(ResultSet resultSet = statement.executeQuery(query))
             {
-                if (resultSet.next())
-                {
-                    u.setLastOnline(resultSet.getLong(1));
-                }
+                result = consumer.apply(resultSet);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
-        return u;
+        return result;
     }
     public User getUser(String login)
     {
@@ -237,24 +270,23 @@ public class DatabaseConnector {
         }
         return u;
     }
-    public Dialog getDialogById(String dialogId)
+    public Dialog getDialogById(Integer dialogId)
     {
         Dialog dialog = new Dialog();
         try(Statement statement = connection.createStatement())
         {
-            String query = "SELECT message_id, sender, text, time FROM messages WHERE dialog_id = "+wrapInQuotes(dialogId)+";";
+            String query = "SELECT dialog_id, message_id, sender, text, time, is_system FROM messages WHERE dialog_id = "+wrapInQuotes(dialogId)+";";
             List<Message> messages = new LinkedList<>();
             try(ResultSet resultSet = statement.executeQuery(query))
             {
                 while (resultSet.next())
                 {
-                    Message m = new Message(resultSet.getInt(1), Integer.parseInt(dialogId),
-                            resultSet.getString(2), resultSet.getString(3), resultSet.getLong(4));
+                    Message m = buildMessage(resultSet);
                     messages.add(m);
                 }
             }
+            dialog.setDialogId(dialogId);
             dialog.setMessages(messages);
-            dialog.setDialogId(Integer.valueOf(dialogId));
         }
         catch (SQLException e)
         {
@@ -275,19 +307,18 @@ public class DatabaseConnector {
             this.put("last_online", Long.toString(System.currentTimeMillis()));
         }}, "online");
     }
-    public FullDialog getFullDialog(String dialogId)
+    public FullDialog getFullDialog(Integer dialogId)
     {
         FullDialog fullDialog = new FullDialog();
         try(Statement statement = connection.createStatement())
         {
-            String query = "SELECT d.dialog_id, d.dialog_name, d.creator, d.last_message_id, d.type, m.sender, m.text, m.time from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id = "+wrapInQuotes(dialogId)+";";
+            String query = "SELECT d.dialog_id as dialog_id, d.dialog_name, d.creator, d.last_message_id as message_id, d.type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id = "+wrapInQuotes(dialogId)+";";
             System.out.println(query);
             try(ResultSet resultSet = statement.executeQuery(query))
             {
                 resultSet.next();
                 DialogInfo info = new DialogInfo(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(5));
-                Message m = new Message(resultSet.getInt(4), resultSet.getInt(1), resultSet.getString(6),
-                        resultSet.getString(7), resultSet.getLong(8));
+                Message m = buildMessage(resultSet);
                 info.setLastMessage(m);
                 fullDialog.setDialogInfo(info);
             }
@@ -350,6 +381,20 @@ public class DatabaseConnector {
     {
         update("dialog_id", dialogId, CustomMap.create().add("last_message_id", messageId), "dialogs");
     }
+    private Message buildMessage(ResultSet resultSet) throws SQLException
+    {
+        Message m = new Message();
+        m.setDialogId(resultSet.getInt("dialog_id"));
+        m.setText(resultSet.getString("text"));
+        m.setTime(resultSet.getLong("time"));
+        m.setMessageId(resultSet.getInt("message_id"));
+        m.setIsSystem(resultSet.getBoolean("is_system"));
+        if (!m.getIsSystem())
+        {
+            m.setSender(resultSet.getString("sender"));
+        }
+        return m;
+    }
     public int addMessage(String dialogId, String sender, String text, String time)
     {
         return insert(CustomMap.create()
@@ -363,7 +408,7 @@ public class DatabaseConnector {
     {
         return checkExistence(CustomMap.create().add(field, value), "users");
     }
-    private String wrapInQuotes(String str)
+    private String wrapInQuotes(Object str)
     {
         return "'"+str+"'";
     }

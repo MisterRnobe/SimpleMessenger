@@ -2,22 +2,14 @@ package common.objects;
 
 import com.alibaba.fastjson.JSONObject;
 
-import javax.print.attribute.standard.NumberUp;
-
 public class Message extends Body{
     private int messageId;
     private int dialogId;
     private String sender;
     private String text;
     private long time;
+    private boolean isSystem;
 
-    public Message(int messageId, int dialogId, String sender, String text, long time) {
-        this.messageId = messageId;
-        this.dialogId = dialogId;
-        this.sender = sender;
-        this.text = text;
-        this.time = time;
-    }
     public Message()
     {}
 
@@ -61,21 +53,16 @@ public class Message extends Body{
         this.time = time;
     }
 
+    public boolean getIsSystem() {
+        return isSystem;
+    }
+
+    public void setIsSystem(boolean system) {
+        isSystem = system;
+    }
+
     @Override
     public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject(){
-            @Override
-            public Object put(String key, Object value) {
-                if (value == null || value instanceof Number && ((Number) value).intValue() == 0)
-                    return value;
-                return super.put(key, value);
-            }
-        };
-        o.put("messageId", messageId);
-        o.put("dialogId", dialogId);
-        o.put("sender", sender);
-        o.put("text", text);
-        o.put("time", time);
-        return o;
+        return super.toJSONObject();
     }
 }

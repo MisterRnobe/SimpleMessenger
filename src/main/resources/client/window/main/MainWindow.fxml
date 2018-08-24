@@ -41,7 +41,7 @@
                         </Text>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="createChannelButton" layoutX="10.0" layoutY="160.0" prefHeight="50.0" onMouseEntered="#onEnter" onMouseExited="#onExit">
+                  <AnchorPane layoutX="10.0" layoutY="160.0" prefHeight="50.0" onMouseEntered="#onEnter" onMouseExited="#onExit" onMouseClicked="#prepareNewChannel">
                      <children>
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Создать канал" textOrigin="TOP" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>

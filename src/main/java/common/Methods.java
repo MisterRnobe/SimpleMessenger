@@ -10,4 +10,5 @@ public class Methods {
     public static final String GET_USER_STATUS = "get_status";
     public static final String FIND_USERS = "find_users";
     public static final String CREATE_GROUP = "create_group";
+    public static final String CREATE_CHANNEL = "create_channel";
 }

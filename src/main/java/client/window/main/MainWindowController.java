@@ -1,8 +1,10 @@
 package client.window.main;
 
+import client.Supplier;
 import client.application.DialogBean;
 import client.window.main.dialog.controllers.AbstractWrapper;
-import client.window.main.menu.AbstractMenuWindow;
+import client.window.main.menu.AbstractWindow;
+import client.window.main.menu.newchannel.ChannelWindowController;
 import client.window.main.menu.newdialog.UserSearchController;
 import client.window.main.menu.newgroup.UserSelectingListController;
 import common.objects.Message;
@@ -11,7 +13,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -23,8 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,21 +38,19 @@ public class MainWindowController {
     @FXML
     private AnchorPane menu;
 
-    @FXML
-    private AnchorPane createChannelButton;
-
     private AnchorPane locker;
-    private ParallelTransition openAnimation, closeAnimation;
-    private AbstractMenuWindow menuWindow;
+    private Timeline fadeAnimation, appearAnimation;
+
+    private AbstractWindow window;
+    private MenuWindow menuWindow;
 
 
     private final Map<Integer, AbstractWrapper> dialogControllerMap = new TreeMap<>();
-    //private final List<DialogChooserController> chooserControllerList = new LinkedList<>();
+    public static final double ANIMATION_TIME = 1/5d;
 
     @FXML
     private void initialize()
     {
-        double time = 1/5d;
         locker = new AnchorPane();
 
         AnchorPane.setBottomAnchor(locker, 0d);
@@ -63,43 +60,30 @@ public class MainWindowController {
 
         locker.setOpacity(0.0);
         locker.setStyle("-fx-background-color: black;");
-        locker.setOnMouseClicked(this::closeMenu);
+        locker.setOnMouseClicked(e->{
+            closeWindow();
+            e.consume();
+        });
 
-        menu.setOnMouseClicked(Event::consume);
 
-        double width = menu.getPrefWidth();
-        //menu.setLayoutX(-width);
-
-        KeyFrame[] slide1 = new KeyFrame[]{
-                new KeyFrame(Duration.ZERO, new KeyValue(menu.translateXProperty(), -width)),
-                new KeyFrame(Duration.seconds(time), new KeyValue(menu.translateXProperty(), 0))
-        };
-        KeyFrame[] fade1 =  new KeyFrame[]{
+        KeyFrame[] appear =  new KeyFrame[]{
                 new KeyFrame(Duration.ZERO, new KeyValue(locker.opacityProperty(), 0)),
-                new KeyFrame(Duration.seconds(time), new KeyValue(locker.opacityProperty(), 0.5d))
+                new KeyFrame(Duration.seconds(ANIMATION_TIME), new KeyValue(locker.opacityProperty(), 0.5d))
         };
-        openAnimation = new ParallelTransition(new Timeline(slide1), new Timeline(fade1));
-        openAnimation.setCycleCount(1);
-
-
-        KeyFrame[] slide2 = new KeyFrame[]{
-                new KeyFrame(Duration.seconds(time), new KeyValue(menu.translateXProperty(), -width)),
-                new KeyFrame(Duration.ZERO, new KeyValue(menu.translateXProperty(), 0))
-        };
-        KeyFrame[] fade2 =  new KeyFrame[]{
+        appearAnimation = new Timeline(appear);
+        KeyFrame[] fade =  new KeyFrame[]{
                 new KeyFrame(Duration.ZERO, new KeyValue(locker.opacityProperty(), 0.5d)),
-                new KeyFrame(Duration.seconds(time), new KeyValue(locker.opacityProperty(), 0.0))
+                new KeyFrame(Duration.seconds(ANIMATION_TIME), new KeyValue(locker.opacityProperty(), 0.0))
         };
-        closeAnimation = new ParallelTransition(new Timeline(slide2), new Timeline(fade2));
-        closeAnimation.setCycleCount(1);
-        closeAnimation.setOnFinished(event -> root.getChildren().remove(locker));
+        fadeAnimation = new Timeline(fade);
+        fadeAnimation.setOnFinished(event -> root.getChildren().remove(locker));
+        menuWindow = new MenuWindow(menu);
+        root.getChildren().remove(menu);
     }
     @FXML
     private void showMenu()
     {
-        locker.setOnMouseClicked(this::closeMenu);
-        root.getChildren().add(root.getChildren().indexOf(menu), locker);
-        openAnimation.play();
+        displayWindow(()->menuWindow);
     }
     @FXML
     private void onEnter(MouseEvent e)
@@ -115,15 +99,19 @@ public class MainWindowController {
         pane.setStyle("-fx-background-color: rgba(255,255,255,0);");
         e.consume();
     }
-    private void closeMenu(MouseEvent event)
-    {
-        closeAnimation.play();
-        event.consume();
-    }
     public void closeWindow()
     {
-        root.getChildren().removeAll(locker, menuWindow.getRoot());
-        menuWindow = null;
+        Timeline close = window.getOnClose();
+        if (close == null) {
+            root.getChildren().removeAll(locker, window.getRoot());
+        }
+        else {
+            close.setOnFinished(e->root.getChildren().remove((Node)e.getSource()));
+            ParallelTransition t = new ParallelTransition(close, fadeAnimation);
+            t.setCycleCount(1);
+            t.play();
+        }
+        window = null;
     }
     @FXML
     private void showUserSearch()
@@ -135,18 +123,44 @@ public class MainWindowController {
     {
         displayWindow(UserSelectingListController::create);
     }
-    private void displayWindow(Supplier<AbstractMenuWindow> supplier)
+    @FXML
+    private void prepareNewChannel()
     {
-        locker.setOnMouseClicked(e-> closeWindow());
-        menu.setTranslateX(-menu.getPrefWidth());
+        displayWindow(ChannelWindowController::create);
+    }
+    public void displayWindow(Supplier<AbstractWindow> supplier)
+    {
+//        locker.setOnMouseClicked(e-> closeWindow());
+//        menu.setTranslateX(-menu.getPrefWidth());
+        if (window != null)
+        {
+            root.getChildren().remove(window.getRoot());
+        }
         try {
-            menuWindow = supplier.get();
-            Pane p = menuWindow.getRoot();
-            root.getChildren().add(p);
-            double width = p.getPrefWidth(), height = p.getPrefHeight();
-            p.translateXProperty().bind(root.widthProperty().add(-width).divide(2));
-            p.translateYProperty().bind(root.heightProperty().add(-height).divide(2));
+            AbstractWindow prepared = supplier.get();
+            Pane p = prepared.getRoot();
 
+            if (window == null)
+            {
+                locker.setOpacity(0.5d);
+                root.getChildren().add(locker);
+            }
+            root.getChildren().add(p);
+
+            Timeline open = prepared.getOnOpen();
+            if (open == null) {
+                prepared.attach();
+            }
+            else
+            {
+                if (window == null)
+                {
+                    ParallelTransition transition = new ParallelTransition(open, appearAnimation);
+                    transition.setCycleCount(1);
+                    transition.play();
+                }
+            }
+            window = prepared;
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -200,10 +214,35 @@ public class MainWindowController {
         loader.load();
         return loader.getController();
     }
-    @FunctionalInterface
-    private interface Supplier<T>
+    static class MenuWindow extends AbstractWindow
     {
-        T get() throws Throwable;
+        public MenuWindow(AnchorPane root)
+        {
+            this.root = root;
+            setOnOpenAnimation();
+            setOnCloseAnimation();
+
+        }
+        private void setOnOpenAnimation()
+        {
+            double width = root.getPrefWidth();
+
+            KeyFrame[] slide = new KeyFrame[]{
+                    new KeyFrame(Duration.ZERO, new KeyValue(root.translateXProperty(), -width)),
+                    new KeyFrame(Duration.seconds(ANIMATION_TIME), new KeyValue(root.translateXProperty(), 0))
+            };
+            this.onOpen = new Timeline(slide);
+        }
+        private void setOnCloseAnimation()
+        {
+            double width = root.getPrefWidth();
+
+            KeyFrame[] slide = new KeyFrame[]{
+                    new KeyFrame(Duration.seconds(ANIMATION_TIME), new KeyValue(root.translateXProperty(), -width)),
+                    new KeyFrame(Duration.ZERO, new KeyValue(root.translateXProperty(), 0))
+            };
+            this.onClose = new Timeline(slide);
+        }
     }
 
 }

@@ -23,11 +23,11 @@ public class UserPasswordData extends Body {
         this.password = password;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject();
-        o.put("login", login);
-        o.put("password", password);
-        return o;
-    }
+//    @Override
+//    public JSONObject toJSONObject() {
+//        JSONObject o = new JSONObject();
+//        o.put("login", login);
+//        o.put("password", password);
+//        return o;
+//    }
 }

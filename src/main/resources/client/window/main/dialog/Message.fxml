@@ -9,7 +9,7 @@
    <children>
       <VBox fx:id="vBox" prefWidth="249.0">
          <children>
-            <Label fx:id="userLabel" text="Name">
+            <Label fx:id="senderLabel" text="Name">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>

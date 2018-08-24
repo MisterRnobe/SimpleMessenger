@@ -45,7 +45,7 @@ public class ApplicationBank {
                     .collect(Collectors.joining(", "));
 
         DialogBean dialogBean = new DialogBean(title,
-                dialogInfo.getLastMessage(), dialogInfo.getType(),dialogInfo.getDialogId());
+                dialogInfo.getLastMessage(), dialogInfo.getCreator(), dialogInfo.getType(),dialogInfo.getDialogId());
         dialogBean.setUsers(dialogInfo.getUsers().stream().map(User::getLogin).collect(Collectors.toList()));
         dialogInfo.getUsers().forEach(u->userMap.put(u.getLogin(), u));
         dialogs.put(dialogBean.dialogId, dialogBean);

@@ -1,5 +1,9 @@
 package client.window.main.dialog;
 
+import client.Supplier;
+import client.window.main.MainWindowController;
+import client.window.main.MainWindowManager;
+import client.window.main.menu.AbstractWindow;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +31,7 @@ public class DialogController {
     protected int dialogId;
 
     private Runnable onSend = ()->{};
+    private Supplier<AbstractWindow> infoWindow;
 
     public Parent getRoot()
     {
@@ -45,6 +50,21 @@ public class DialogController {
     {
         onSend.run();
         messageField.setText("");
+    }
+    @FXML
+    private void showInfo()
+    {
+        try {
+            AbstractWindow w = infoWindow.get();
+            MainWindowManager.getInstance().displayWindow(w);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+    }
+
+    public void setInfoWindow(Supplier<AbstractWindow> infoWindow) {
+        this.infoWindow = infoWindow;
     }
 
     public void setOnSend(Runnable onSend) {
