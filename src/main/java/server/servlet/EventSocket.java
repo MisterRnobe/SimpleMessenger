@@ -14,9 +14,8 @@ import server.OnlineManager;
 import server.core.*;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,8 @@ public class EventSocket extends WebSocketAdapter {
     //Handlers
     private SendMessageHandler messageHandler;
 
+    //
+    private List<Runnable> onCloseListeners = new LinkedList<>();
 
     @Override
     public void onWebSocketConnect(Session sess) {
@@ -56,9 +57,13 @@ public class EventSocket extends WebSocketAdapter {
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
         super.onWebSocketClose(statusCode, reason);
+        onCloseListeners.forEach(Runnable::run);
+        onCloseListeners.clear();
+        onCloseListeners = null;
         OnlineManager.getInstance().setOffline(login);
         System.out.println("CLOSED");
     }
+
     private Response onLogin(Request request)
     {
         Response r = new LoginHandler().handle(request);
@@ -112,6 +117,10 @@ public class EventSocket extends WebSocketAdapter {
             e.printStackTrace();
         }
     }
+    public void addOnCloseListener(Runnable r)
+    {
+        onCloseListeners.add(r);
+    }
     private void onStart()
     {
         handlers.put(Methods.REGISTER, r->new RegistrationHandler().handle(r));
@@ -128,7 +137,9 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.CREATE_GROUP, r-> this.onCreateDialog(r, new CreateGroupHandler(login)));
         handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
         handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
-        handlers.put(Methods.GET_USER_STATUS, r-> new GetUserStatusHandler().handle(r));
+        handlers.put(Methods.HOOK_USER_STATUS, r-> new HookUserStatusHandler(this).handle(r));
         handlers.put(Methods.FIND_USERS, r-> new FindUsersHandler().handle(r));
+        handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
+        handlers.put(Methods.READ_MESSAGES, r->new ReadMessagesHandler(login).handle(r));
     }
 }

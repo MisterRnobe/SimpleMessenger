@@ -18,8 +18,8 @@ public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
             throw new HandleError(Errors.INTERNAL_ERROR);
         else
         {
-            int messageId = DatabaseConnector.getInstance().addMessage(Integer.toString(dialogId), null, "Created!", Long.toString(System.currentTimeMillis()));
-            DatabaseConnector.getInstance().setLastMessage(Integer.toString(dialogId), Integer.toString(messageId));
+            int messageId = DatabaseConnector.getInstance().addMessage(dialogId, null, "Created!", System.currentTimeMillis());
+            DatabaseConnector.getInstance().setLastMessage(dialogId, messageId);
             return DatabaseConnector.getInstance().getFullDialog(dialogId);
         }
     }

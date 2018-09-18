@@ -4,16 +4,23 @@ import common.Errors;
 import common.Request;
 import common.Response;
 import common.objects.Body;
+import common.objects.User;
+import server.DatabaseConnector;
 
 public abstract class AbstractHandler<T extends Body> {
     private final Class<T> requiredClass;
     private final String[] requiredFields;
     protected final String login;
-    AbstractHandler(Class<T> requiredClass, String[] requiredFields, String login)
+    protected User user;
+    public AbstractHandler(Class<T> requiredClass, String[] requiredFields, String login)
     {
         this.requiredClass = requiredClass;
         this.requiredFields = requiredFields;
         this.login = login;
+        if (login != null)
+        {
+            user = DatabaseConnector.getInstance().getUser(login);
+        }
     }
     protected abstract Body onHandle(T body) throws HandleError;
     public Response handle(Request request)
@@ -44,6 +51,7 @@ public abstract class AbstractHandler<T extends Body> {
                 Body b = onHandle(request.getBody().toJavaObject(requiredClass));
                 r.setStatus(Response.OK);
                 r.setBody(b.toJSONObject());
+                beforeSend(r);
             }
             catch (HandleError e)
             {
@@ -53,5 +61,8 @@ public abstract class AbstractHandler<T extends Body> {
         }
         return r;
     }
+    protected void beforeSend(Response response)
+    {
 
+    }
 }

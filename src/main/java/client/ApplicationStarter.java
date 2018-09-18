@@ -1,13 +1,12 @@
 package client;
 
-import client.application.ApplicationBank;
+import client.utils.ApplicationBank;
 import client.network.SocketConnection;
-import client.window.initial.InitialWindowController;
+import client.app.initial.InitialWindowController;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.eclipse.jetty.client.HttpClient;
 
 public class ApplicationStarter extends Application{
     public void start(Stage primaryStage) throws Exception {

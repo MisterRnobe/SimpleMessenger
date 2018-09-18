@@ -1,15 +1,11 @@
 package client.network.queries;
 
-import client.application.ApplicationBank;
 import client.network.ClientSocket;
-import client.window.main.MainWindowManager;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
 import common.Response;
-import common.objects.Dialog;
 import common.objects.UserList;
-import common.objects.requests.DialogRequest;
 import common.objects.requests.FindUsersRequest;
 
 import java.io.IOException;

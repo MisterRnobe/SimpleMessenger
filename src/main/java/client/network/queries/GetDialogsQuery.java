@@ -1,6 +1,6 @@
 package client.network.queries;
 
-import client.application.ApplicationBank;
+import client.utils.ApplicationBank;
 import client.network.ClientSocket;
 import com.alibaba.fastjson.JSON;
 import common.Methods;

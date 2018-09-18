@@ -1,6 +1,6 @@
 package client.network.queries;
 
-import client.application.Listener;
+import client.utils.Listener;
 import client.network.ClientSocket;
 import common.Methods;
 import common.Request;

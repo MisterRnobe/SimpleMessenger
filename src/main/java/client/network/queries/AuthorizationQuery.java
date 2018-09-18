@@ -1,8 +1,8 @@
 package client.network.queries;
 
-import client.application.ApplicationBank;
+import client.utils.ApplicationBank;
 import client.network.ClientSocket;
-import client.window.main.MainWindowManager;
+import client.app.main.MainWindowManager;
 import common.Methods;
 import common.Request;
 import common.Response;

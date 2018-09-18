@@ -2,7 +2,7 @@ package common.objects;
 
 import java.util.List;
 
-public class DialogInfo {
+public class DialogInfo extends Body{
     public static final int DIALOG = 0;
     public static final int GROUP = 1;
     public static final int CHANNEL = 2;
@@ -12,6 +12,7 @@ public class DialogInfo {
     private String creator;
     private Message lastMessage;
     private List<User> users;
+    private int unread;
 
     public DialogInfo(int dialogId, String dialogName, String creator, int type) {
         this.dialogId = dialogId;
@@ -67,6 +68,14 @@ public class DialogInfo {
 
     public Message getLastMessage() {
         return lastMessage;
+    }
+
+    public int getUnread() {
+        return unread;
+    }
+
+    public void setUnread(int unread) {
+        this.unread = unread;
     }
 
     public void setLastMessage(Message lastMessage) {

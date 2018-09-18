@@ -11,11 +11,9 @@ public class SendMessageHandler extends AbstractHandler<Message>{
 
     @Override
     protected Body onHandle(Message body) throws HandleError {
-        String dialogId = Integer.toString(body.getDialogId()),
-                text = body.getText();
         long time = System.currentTimeMillis();
-        int messageId = DatabaseConnector.getInstance().addMessage(dialogId, login, text, Long.toString(time));
-        DatabaseConnector.getInstance().setLastMessage(dialogId, Integer.toString(messageId));
+        int messageId = DatabaseConnector.getInstance().addMessage(body.getDialogId(), login, body.getText(), time);
+        DatabaseConnector.getInstance().setLastMessage(body.getDialogId(), messageId);
         body.setSender(login);
         body.setMessageId(messageId);
         body.setTime(time);

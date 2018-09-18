@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -175,14 +174,13 @@ public class DatabaseConnector {
         DialogList dialogList = new DialogList();
         try(Statement statement = connection.createStatement())
         {
-            String query = "SELECT d.dialog_id as dialog_id, d.dialog_name, d.creator, d.last_message_id as message_id, d.type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = "+wrapInQuotes(login)+" LIMIT "+count+";";
+            String query = "SELECT d.dialog_id as dialog_id, d.dialog_name, d.creator, d.last_message_id as message_id, d.type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = "+wrapInQuotes(login)+" ORDER BY time LIMIT "+count+";";
             System.out.println(query);
             try(ResultSet resultSet = statement.executeQuery(query))
             {
 
                 while(resultSet.next())
                 {
-                    System.out.println("RESULT: "+resultSet.getString("m.text"));
                     DialogInfo info = new DialogInfo(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(5));
                     Message m = buildMessage(resultSet);
                     info.setLastMessage(m);
@@ -195,6 +193,21 @@ public class DatabaseConnector {
             e.printStackTrace();
         }
         dialogList.getDialogs().forEach(d-> d.setUsers(getUsersInDialog(d.getDialogId())));
+        String dialogIds = dialogList.getDialogs().stream().map(DialogInfo::getDialogId).map(Object::toString).collect(Collectors.joining(",","(",")"));
+        String query = "SELECT m.dialog_id as dialog_id, count(*) as count FROM messages as m left join unread_messages as u_m on m.message_id = u_m.message_id where u_m.login = "+wrapInQuotes(login)+" AND m.dialog_id IN "+dialogIds+" group by m.dialog_id;";
+        executeSelect(query, resultSet -> {
+            try {
+                while (resultSet.next()) {
+                    int dialogId = resultSet.getInt("dialog_id");
+                    int unread = resultSet.getInt("count");
+                    dialogList.getDialogs().stream().filter(d->d.getDialogId() == dialogId).findFirst().ifPresent(dialogInfo -> dialogInfo.setUnread(unread));
+                }
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
+            return null;
+        });
         return dialogList;
     }
     private int insert(Map<String, String> map, String table)
@@ -250,6 +263,37 @@ public class DatabaseConnector {
         }
         return result;
     }
+    private boolean doQuery(String query)
+    {
+        System.out.println(query);
+        try(Statement statement = connection.createStatement())
+        {
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    public List<Message> getMessagesByIds(List<Integer> ids)
+    {
+        String query = "SELECT * FROM messages WHERE message_id IN "+
+                ids.stream().map(Object::toString).collect(Collectors.joining(",","(", ")"))+";";
+        return executeSelect(query, resultSet -> {
+            List<Message> messages = new LinkedList<>();
+            try {
+                while (resultSet.next())
+                {
+                    messages.add(buildMessage(resultSet));
+                }
+            }
+            catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
+            return messages;
+        });
+    }
     public User getUser(String login)
     {
         User u = new User();
@@ -269,6 +313,18 @@ public class DatabaseConnector {
             e.printStackTrace();
         }
         return u;
+    }
+    public boolean readMessages(Integer dialogId, String login)
+    {
+        String query = "DELETE from unread_messages where login = "+wrapInQuotes(login)+" and message_id IN (select message_id from messages where dialog_id = "+wrapInQuotes(dialogId)+");";
+        return doQuery(query);
+    }
+    public void addUsersToDialog(Integer dialogId, List<String> users)
+    {
+        users.forEach(str-> insert(CustomMap.create()
+                .add("dialog_id", dialogId.toString())
+                .add("login", str),
+                "user_dialog"));
     }
     public Dialog getDialogById(Integer dialogId)
     {
@@ -377,9 +433,9 @@ public class DatabaseConnector {
             return false;
         }
     }
-    public void setLastMessage(String dialogId, String messageId)
+    public void setLastMessage(Integer dialogId, Integer messageId)
     {
-        update("dialog_id", dialogId, CustomMap.create().add("last_message_id", messageId), "dialogs");
+        update("dialog_id", dialogId.toString(), CustomMap.create().add("last_message_id", messageId.toString()), "dialogs");
     }
     private Message buildMessage(ResultSet resultSet) throws SQLException
     {
@@ -395,13 +451,20 @@ public class DatabaseConnector {
         }
         return m;
     }
-    public int addMessage(String dialogId, String sender, String text, String time)
+    public int addMessage(Integer dialogId, String sender, String text, Long time)
     {
-        return insert(CustomMap.create()
+        int messageId = insert(CustomMap.create()
                 .add("sender", sender)
-                .add("dialog_id", dialogId)
+                .add("dialog_id", dialogId.toString())
                 .add("text",text)
-                .add("time",time),"messages");
+                .add("time",time.toString())
+                .add("is_system", sender == null? "1": "0"),"messages");
+        getUsersInDialog(dialogId).stream().map(User::getLogin).filter(s->!s.equalsIgnoreCase(sender))
+                .forEach(str-> insert(CustomMap.create()
+                .add("login", str)
+                .add("message_id", Integer.toString(messageId)), "unread_messages"));
+
+        return messageId;
     }
 
     public boolean checkUserExistence(String field, String value)
