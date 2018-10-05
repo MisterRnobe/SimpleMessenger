@@ -1,19 +1,13 @@
 package server.core;
 
-import com.alibaba.fastjson.JSONObject;
 import common.Errors;
-import common.Request;
 import common.Response;
 import common.objects.Body;
-import common.objects.Dialog;
 import common.objects.requests.CreateDialogRequest;
-import common.objects.requests.DialogListRequest;
-import server.DatabaseConnector;
-import server.OnlineManager;
+import server.database.DatabaseExtractor;
+import server.database.DatabaseManager;
 
-import java.util.List;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.sql.SQLException;
 
 public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
 
@@ -23,22 +17,19 @@ public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
     }
 
     @Override
-    protected Body onHandle(CreateDialogRequest body) throws HandleError {
+    protected Body onHandle(CreateDialogRequest body) throws HandleError, SQLException {
         String creator = login,
                 partner = body.getPartner(),
                 initialMessage = body.getInitialMessage();
-
-        int dialogId = DatabaseConnector.getInstance().createDialog(creator, partner);
+        DatabaseExtractor extractor = DatabaseManager.getExtractor();
+        int dialogId = extractor.createDialog(creator, partner);
         if (dialogId == -1)
         {
             throw new HandleError(Errors.INTERNAL_ERROR);
         }
-        else
-        {
-            int messageId = DatabaseConnector.getInstance().addMessage(dialogId, creator, initialMessage, System.currentTimeMillis());
-            DatabaseConnector.getInstance().setLastMessage(dialogId, messageId);
-            return DatabaseConnector.getInstance().getFullDialog(dialogId);
-        }
+        int messageId = extractor.addMessage(dialogId, creator, initialMessage, System.currentTimeMillis());
+        extractor.setLastMessage(dialogId, messageId);
+        return extractor.getFullDialog(dialogId);
     }
 
     @Override

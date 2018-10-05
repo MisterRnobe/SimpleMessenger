@@ -1,8 +1,10 @@
 package server;
 
 import common.Response;
+import server.database.DatabaseExtractor;
+import server.database.DatabaseManager;
 import server.servlet.EventSocket;
-
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -18,15 +20,23 @@ public class OnlineManager {
         return instance;
     }
 
+    private final DatabaseExtractor extractor = DatabaseManager.getExtractor();
+
     private OnlineManager(){}
 
     public void setOnline(String login, EventSocket socket)
     {
         online.put(login, socket);
-        DatabaseConnector.getInstance().setOnline(login);
-        List<Consumer<Boolean>> l = eventListeners.get(login);
-        if (l != null)
-            l.forEach(c->c.accept(true));
+        try {
+            extractor.setOnline(login);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            List<Consumer<Boolean>> l = eventListeners.get(login);
+            if (l != null)
+                l.forEach(c->c.accept(true));
+        }
     }
     public void setOffline(String login)
     {
@@ -34,7 +44,12 @@ public class OnlineManager {
         if (l != null)
             l.forEach(c->c.accept(false));
         online.remove(login);
-        DatabaseConnector.getInstance().setOffline(login);
+        //DatabaseConnectorOld.getInstance().setOffline(login);
+        try {
+            extractor.setOffline(login);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendAll(Response response, Collection<String> logins)

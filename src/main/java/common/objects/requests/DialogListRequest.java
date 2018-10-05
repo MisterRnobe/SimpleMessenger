@@ -1,17 +1,16 @@
 package common.objects.requests;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import common.objects.Body;
 
 public class DialogListRequest extends Body {
-    private String count;
+    private Integer count;
 
-    public String getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(String count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
 

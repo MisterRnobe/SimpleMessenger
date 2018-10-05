@@ -1,6 +1,5 @@
 package client.network;
 
-import client.UserSocket;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
@@ -9,6 +8,7 @@ import java.util.concurrent.Future;
 
 public class SocketConnection {
     public static final URI uri = URI.create("ws://localhost:200/connect/");
+    public static final int MAX_MESSAGE_SIZE = 104857600;
     private static Session SESSION;
     private static WebSocketClient client;
     public static void connect()
@@ -17,6 +17,7 @@ public class SocketConnection {
         try
         {
             client.start();
+            client.getPolicy().setMaxTextMessageSize(MAX_MESSAGE_SIZE);
             // The socket that receives events
             ClientSocket socket = new ClientSocket();
             // Attempt Connect

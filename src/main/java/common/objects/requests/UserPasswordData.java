@@ -1,6 +1,5 @@
 package common.objects.requests;
 
-import com.alibaba.fastjson.JSONObject;
 import common.objects.Body;
 
 public class UserPasswordData extends Body {
@@ -23,11 +22,4 @@ public class UserPasswordData extends Body {
         this.password = password;
     }
 
-//    @Override
-//    public JSONObject toJSONObject() {
-//        JSONObject o = new JSONObject();
-//        o.put("login", login);
-//        o.put("password", password);
-//        return o;
-//    }
 }

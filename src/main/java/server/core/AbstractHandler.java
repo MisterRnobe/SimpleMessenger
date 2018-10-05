@@ -4,28 +4,22 @@ import common.Errors;
 import common.Request;
 import common.Response;
 import common.objects.Body;
-import common.objects.User;
-import server.DatabaseConnector;
+
+import java.sql.SQLException;
 
 public abstract class AbstractHandler<T extends Body> {
     private final Class<T> requiredClass;
     private final String[] requiredFields;
     protected final String login;
-    protected User user;
     public AbstractHandler(Class<T> requiredClass, String[] requiredFields, String login)
     {
         this.requiredClass = requiredClass;
         this.requiredFields = requiredFields;
         this.login = login;
-        if (login != null)
-        {
-            user = DatabaseConnector.getInstance().getUser(login);
-        }
     }
-    protected abstract Body onHandle(T body) throws HandleError;
+    protected abstract Body onHandle(T body) throws HandleError, SQLException;
     public Response handle(Request request)
     {
-
         Response r = new Response();
         r.setType(request.getMethod());
         if (request.getBody() == null)
@@ -57,6 +51,12 @@ public abstract class AbstractHandler<T extends Body> {
             {
                 r.setStatus(Response.ERROR);
                 r.setCode(e.getCode());
+            }
+            catch (SQLException sql)
+            {
+                sql.printStackTrace();
+                r.setStatus(Response.ERROR);
+                r.setCode(Errors.INTERNAL_ERROR);
             }
         }
         return r;

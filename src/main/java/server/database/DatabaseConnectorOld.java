@@ -1,8 +1,9 @@
-package server;
+package server.database;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import common.objects.*;
+import server.OnlineManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,20 +11,20 @@ import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import static server.database.MySQLExtractor.CustomMap;
 
-public class DatabaseConnector {
-    private static DatabaseConnector instance;
-    static void init()
-    {
-        instance = new DatabaseConnector();
-    }
+@Deprecated
+public class DatabaseConnectorOld {
+    private static DatabaseConnectorOld instance;
 
-    public static DatabaseConnector getInstance() {
+    @Deprecated public static DatabaseConnectorOld getInstance() {
+        if (instance == null)
+            instance = new DatabaseConnectorOld();
         return instance;
     }
 
     private Connection connection;
-    private DatabaseConnector()
+    private DatabaseConnectorOld()
     {
         try(Scanner s = new Scanner(new File("target/classes/server/data.txt")))
         {
@@ -45,26 +46,27 @@ public class DatabaseConnector {
             e.printStackTrace();
         }
     }
-    public boolean verifyUser(String login, String password)
+    @Deprecated public boolean verifyUser(String login, String password)
     {
         return checkExistence(new TreeMap<String, String>(){
             {this.put("login", login); this.put("password", password);}
         }, "users");
     }
-    public void addUser(String login, String password, String name, String email, String info)
+    @Deprecated public void addUser(String login, String password, String name, String email, String info, boolean hasAvatar)
     {
         insert(CustomMap.create()
                 .add("login", login)
                 .add("password", password)
                 .add("name", name)
                 .add("email", email)
-                .add("info", info), "users");
+                .add("info", info)
+                .add("has_avatar", hasAvatar? "1":"0"), "users");
         insert(CustomMap.create()
                 .add("login", login)
                 .add("last_online", Long.toString(System.currentTimeMillis()))
                 .add("online", "0"), "online");
     }
-    public int createGroup(String creator, String title, List<String> partners)
+    @Deprecated public int createGroup(String creator, String title, List<String> partners)
     {
         int dialogId = insert(CustomMap.create()
                 .add("dialog_name", title)
@@ -85,7 +87,7 @@ public class DatabaseConnector {
                 ));
         return dialogId;
     }
-    public int createChannel(String creator, String title, List<String> partners)
+    @Deprecated public int createChannel(String creator, String title, List<String> partners)
     {
         int dialogId = insert(CustomMap.create()
                 .add("dialog_name", title)
@@ -105,7 +107,7 @@ public class DatabaseConnector {
         return dialogId;
     }
 
-    public int createDialog(String creator, String partner)
+    @Deprecated public int createDialog(String creator, String partner)
     {
         int dialogId = insert(CustomMap.create()
                 .add("creator", creator)
@@ -120,7 +122,7 @@ public class DatabaseConnector {
                 .add("dialog_id", Integer.toString(dialogId)), "user_dialog");
         return dialogId;
     }
-    public List<User> getUsersInDialog(Integer dialogId)
+    @Deprecated public List<User> getUsersInDialog(Integer dialogId)
     {
         List<User> users = new LinkedList<>();
         try(Statement statement = connection.createStatement())
@@ -143,7 +145,7 @@ public class DatabaseConnector {
         }
         return users;
     }
-    public List<User> findUsers(String mask)
+    @Deprecated public List<User> findUsers(String mask)
     {
         List<User> userList = new LinkedList<>();
         try (Statement statement = connection.createStatement())
@@ -169,7 +171,7 @@ public class DatabaseConnector {
         }
         return userList;
     }
-    public DialogList getDialogs(String login, String count)
+    @Deprecated public DialogList getDialogs(String login, String count)
     {
         DialogList dialogList = new DialogList();
         try(Statement statement = connection.createStatement())
@@ -231,7 +233,26 @@ public class DatabaseConnector {
             return -1;
         }
     }
-    public User getUserStatus(String login)
+    @Deprecated public UserProfile getUserProfile(String login)
+    {
+        return executeSelect("SELECT name, email, info FROM users WHERE login = "+wrapInQuotes(login)+";", resultSet -> {
+            UserProfile userProfile = new UserProfile();
+            userProfile.setLogin(login);
+            try{
+                if (resultSet.next())
+                {
+                    userProfile.setEmail(resultSet.getString("email"));
+                    userProfile.setInfo(resultSet.getString("info"));
+                    userProfile.setName(resultSet.getString("name"));
+                }
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
+            return userProfile;
+        });
+    }
+    @Deprecated public User getUserStatus(String login)
     {
         return executeSelect("SELECT last_online FROM online WHERE login = " + wrapInQuotes(login) + ";",
                 resultSet -> {
@@ -275,7 +296,7 @@ public class DatabaseConnector {
         }
         return true;
     }
-    public List<Message> getMessagesByIds(List<Integer> ids)
+    @Deprecated public List<Message> getMessagesByIds(List<Integer> ids)
     {
         String query = "SELECT * FROM messages WHERE message_id IN "+
                 ids.stream().map(Object::toString).collect(Collectors.joining(",","(", ")"))+";";
@@ -294,7 +315,7 @@ public class DatabaseConnector {
             return messages;
         });
     }
-    public User getUser(String login)
+    @Deprecated public User getUser(String login)
     {
         User u = new User();
         try(Statement statement = connection.createStatement())
@@ -314,19 +335,19 @@ public class DatabaseConnector {
         }
         return u;
     }
-    public boolean readMessages(Integer dialogId, String login)
+    @Deprecated public boolean readMessages(Integer dialogId, String login)
     {
         String query = "DELETE from unread_messages where login = "+wrapInQuotes(login)+" and message_id IN (select message_id from messages where dialog_id = "+wrapInQuotes(dialogId)+");";
         return doQuery(query);
     }
-    public void addUsersToDialog(Integer dialogId, List<String> users)
+    @Deprecated public void addUsersToDialog(Integer dialogId, List<String> users)
     {
         users.forEach(str-> insert(CustomMap.create()
                 .add("dialog_id", dialogId.toString())
                 .add("login", str),
                 "user_dialog"));
     }
-    public Dialog getDialogById(Integer dialogId)
+    @Deprecated public Dialog getDialogById(Integer dialogId)
     {
         Dialog dialog = new Dialog();
         try(Statement statement = connection.createStatement())
@@ -350,20 +371,20 @@ public class DatabaseConnector {
         }
         return dialog;
     }
-    public void setOnline(String login)
+    @Deprecated public void setOnline(String login)
     {
         update("login", login, new TreeMap<String, String>(){{
             this.put("online", "1");
         }}, "online");
     }
-    public void setOffline(String login)
+    @Deprecated public void setOffline(String login)
     {
         update("login", login, new TreeMap<String, String>(){{
             this.put("online", "0");
             this.put("last_online", Long.toString(System.currentTimeMillis()));
         }}, "online");
     }
-    public FullDialog getFullDialog(Integer dialogId)
+    @Deprecated public FullDialog getFullDialog(Integer dialogId)
     {
         FullDialog fullDialog = new FullDialog();
         try(Statement statement = connection.createStatement())
@@ -433,7 +454,7 @@ public class DatabaseConnector {
             return false;
         }
     }
-    public void setLastMessage(Integer dialogId, Integer messageId)
+    @Deprecated public void setLastMessage(Integer dialogId, Integer messageId)
     {
         update("dialog_id", dialogId.toString(), CustomMap.create().add("last_message_id", messageId.toString()), "dialogs");
     }
@@ -451,7 +472,7 @@ public class DatabaseConnector {
         }
         return m;
     }
-    public int addMessage(Integer dialogId, String sender, String text, Long time)
+    @Deprecated public int addMessage(Integer dialogId, String sender, String text, Long time)
     {
         int messageId = insert(CustomMap.create()
                 .add("sender", sender)
@@ -467,7 +488,7 @@ public class DatabaseConnector {
         return messageId;
     }
 
-    public boolean checkUserExistence(String field, String value)
+    @Deprecated public boolean checkUserExistence(String field, String value)
     {
         return checkExistence(CustomMap.create().add(field, value), "users");
     }
@@ -504,17 +525,6 @@ public class DatabaseConnector {
         return new String[]{fields.toString(), vals.toString()};
 
     }
-    public static class CustomMap extends TreeMap<String, String>
-    {
-        public static CustomMap create()
-        {
-            return new CustomMap();
-        }
-        public CustomMap add(String key, String value)
-        {
-            this.put(key, value);
-            return this;
-        }
-    }
+
 
 }

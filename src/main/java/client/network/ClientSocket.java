@@ -1,6 +1,5 @@
 package client.network;
 
-import client.app.main.dialog.info.AddUsersToGroupController;
 import client.network.queries.*;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
@@ -8,10 +7,9 @@ import common.Request;
 import common.Response;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import server.core.CreateChannelHandler;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,6 +32,8 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.MODIFY_GROUP, GroupModificationQuery::onHandle);
         handlers.put(Methods.JOIN_GROUP, GroupModificationQuery::onJoinedGroup);
         handlers.put(Methods.READ_MESSAGES, ReadMessageQuery::onHandle);
+        handlers.put(Methods.GET_PROFILE, GetUserProfileQuery::handle);
+        handlers.put(Methods.VERIFY_DATA, VerifyDataRequest::onHandle);
     }
 
     public static ClientSocket getInstance() {
@@ -43,6 +43,7 @@ public class ClientSocket extends WebSocketAdapter {
         String s = JSON.toJSONString(r);
         System.out.println("Sending: "+s);
         getSession().getRemote().sendString(s);
+        //System.out.println("JUST SENT!");
     }
 
     @Override
@@ -58,5 +59,10 @@ public class ClientSocket extends WebSocketAdapter {
         Consumer<Response>  consumer = handlers.get(r.getType());
         if (consumer != null)
             consumer.accept(r);
+    }
+
+    @Override
+    public void onWebSocketError(Throwable cause) {
+        System.out.println("ERROR: "+cause.getMessage());
     }
 }

@@ -1,12 +1,21 @@
 package common.objects;
 
-import com.alibaba.fastjson.JSONObject;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class User extends Body {
     private String login;
     private String name;
     private boolean isOnline;
     private long lastOnline;
+    private byte[] avatar;
+    private Image image = null;
 
     public String getLogin() {
         return login;
@@ -40,13 +49,26 @@ public class User extends Body {
         this.lastOnline = lastOnline;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject();
-        o.put("login", login);
-        o.put("name", name);
-        o.put("isOnline", isOnline);
-        o.put("lastOnline", lastOnline);
-        return o;
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+    public Image FXImage()
+    {
+        if (avatar == null)
+            return null;
+        if (image == null) {
+            try (ByteArrayInputStream stream = new ByteArrayInputStream(avatar)) {
+                BufferedImage bi = ImageIO.read(stream);
+                this.image = SwingFXUtils.toFXImage(bi, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Не удалось загрузить фотку((");
+            }
+        }
+        return image;
     }
 }

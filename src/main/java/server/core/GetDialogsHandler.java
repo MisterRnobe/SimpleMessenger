@@ -1,9 +1,15 @@
 package server.core;
 
 import common.objects.Body;
+import common.objects.DialogInfo;
 import common.objects.DialogList;
+import common.objects.User;
 import common.objects.requests.DialogListRequest;
-import server.DatabaseConnector;
+import server.database.DatabaseConnectorOld;
+import server.database.DatabaseManager;
+
+import java.sql.SQLException;
+import java.util.Optional;
 
 public class GetDialogsHandler extends AbstractHandler<DialogListRequest> {
     public GetDialogsHandler(String login) {
@@ -11,8 +17,13 @@ public class GetDialogsHandler extends AbstractHandler<DialogListRequest> {
     }
 
     @Override
-    protected Body onHandle(DialogListRequest body) throws HandleError {
-        return DatabaseConnector.getInstance().getDialogs(login, body.getCount());
+    protected Body onHandle(DialogListRequest body) throws HandleError, SQLException {
+        DialogList dialogList = DatabaseManager.getExtractor().getDialogs(login, body.getCount());
+        dialogList.getDialogs().stream().filter(di->di.getType() == DialogInfo.DIALOG).forEach(di-> {
+            Optional<User> o = di.getUsers().stream().filter(u->!u.getLogin().equalsIgnoreCase(login)).findFirst();
+            di.setPhoto(o.map(User::getAvatar).orElse(null));
+        });
+        return dialogList;
     }
 
 }

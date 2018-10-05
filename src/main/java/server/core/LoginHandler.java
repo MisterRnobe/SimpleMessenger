@@ -3,7 +3,11 @@ package server.core;
 import common.Errors;
 import common.objects.Body;
 import common.objects.requests.UserPasswordData;
-import server.DatabaseConnector;
+import server.database.DatabaseConnectorOld;
+import server.database.DatabaseExtractor;
+import server.database.DatabaseManager;
+
+import java.sql.SQLException;
 
 public class LoginHandler extends AbstractHandler<UserPasswordData> {
     public LoginHandler() {
@@ -11,12 +15,9 @@ public class LoginHandler extends AbstractHandler<UserPasswordData> {
     }
 
     @Override
-    protected Body onHandle(UserPasswordData body) throws HandleError {
-
-        if (!DatabaseConnector.getInstance().checkUserExistence("login", body.getLogin())) {
-            throw new HandleError(Errors.NOT_EXIST);
-        }
-        else if (!DatabaseConnector.getInstance().verifyUser(body.getLogin(), body.getPassword()))
+    protected Body onHandle(UserPasswordData body) throws HandleError, SQLException {
+        DatabaseExtractor extractor = DatabaseManager.getExtractor();
+        if (!extractor.verifyUser(body))
         {
             throw new HandleError(Errors.BAD_PASSWORD);
         }

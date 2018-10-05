@@ -3,7 +3,10 @@ package server.core;
 import common.Errors;
 import common.objects.Body;
 import common.objects.ReadMessages;
-import server.DatabaseConnector;
+import server.database.DatabaseConnectorOld;
+import server.database.DatabaseManager;
+
+import java.sql.SQLException;
 
 public class ReadMessagesHandler extends AbstractHandler<ReadMessages> {
     public ReadMessagesHandler(String login) {
@@ -11,11 +14,8 @@ public class ReadMessagesHandler extends AbstractHandler<ReadMessages> {
     }
 
     @Override
-    protected Body onHandle(ReadMessages body) throws HandleError {
-        boolean ok = DatabaseConnector.getInstance().readMessages(body.getDialogId(), login);
-        if (ok)
-            return body;
-        else
-            throw new HandleError(Errors.INTERNAL_ERROR);
+    protected Body onHandle(ReadMessages body) throws HandleError, SQLException {
+        DatabaseManager.getExtractor().readMessages(body.getDialogId(), login);
+        return body;
     }
 }

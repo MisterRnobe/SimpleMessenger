@@ -28,7 +28,7 @@ public class ServerLauncher {
 
 
         contextHandler.addServlet(EventServlet.class,"/connect/");
-        DatabaseConnector.init();
+        //DatabaseConnectorOld.init();
         try {
             server.start();
             server.join();

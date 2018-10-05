@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class RegistrationQuery {
     private static Listener<Integer> errorListener, successListener;
-    public static void sendQuery(String login, String password, String name, String email, String info) throws IOException {
+    public static void sendQuery(String login, String password, String name, String email, String info, byte[] avatar) throws IOException {
 
         RegistrationData data = new RegistrationData();
         data.setPassword(password);
@@ -19,6 +19,7 @@ public class RegistrationQuery {
         data.setName(name);
         data.setEmail(email);
         data.setInfo(info);
+        data.setAvatar(avatar);
         Request r = new Request().setMethod(Methods.REGISTER).setBody(data.toJSONObject());
         ClientSocket.getInstance().send(r);
     }

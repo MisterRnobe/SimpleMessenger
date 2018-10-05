@@ -1,25 +1,25 @@
 package client.app.registration;
 
-import client.utils.ControllerLoader;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-public class SecondPageController {
+public class SecondPageController extends PageController{
     @FXML
     private VBox box;
 
     private ImagePreview preview;
-    private static final String FILE_NAME = "SecondPageForm.fxml";
 
 
     @FXML
@@ -34,8 +34,8 @@ public class SecondPageController {
         {
             System.out.println(avatar.getPath());
             Image image = new Image("file:///"+avatar.getPath());
+            System.out.println(avatar.getPath());
             preview.setPreview(image);
-            //preview.setFill(new ImagePattern(image,0,0,1,1,true));
         }
     }
 
@@ -46,12 +46,19 @@ public class SecondPageController {
         Image image = preview.getImage();
 
         PixelReader reader = image.getPixelReader();
-        WritableImage wi = new WritableImage(reader, (int)d[0], (int)d[1], (int)d[2], (int) d[2] );
+        WritableImage wi = new WritableImage(reader, (int)d[0], (int)d[1], (int)d[2], (int) d[2]);
 
         BufferedImage bi = SwingFXUtils.fromFXImage(wi, null);
-        //RegistrationController.finish();
-        //RegistrationController.getQuery().setAvatar(TransmittableImage.createFrom(bi));
-        //RegistrationHandler.enableThirdPage();
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(bi, "png", stream);
+            byte[] bytes = stream.toByteArray();
+            System.out.println("SIZE: "+bytes.length);
+            RegistrationController.finish(bytes);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -65,8 +72,15 @@ public class SecondPageController {
         preview = new ImagePreview(100);
         box.getChildren().add(0, preview.getRoot());
     }
-    public static Parent create() throws IOException
+    public static SecondPageController create() throws IOException
     {
-        return ControllerLoader.create(SecondPageController.class.getResource(FILE_NAME));
+        FXMLLoader loader = new FXMLLoader(SecondPageController.class.getResource("SecondPageForm.fxml"));
+        loader.load();
+        return loader.getController();
+    }
+
+    @Override
+    public void displayMessage(String message) {
+        System.out.println("Ошибка: "+message);
     }
 }

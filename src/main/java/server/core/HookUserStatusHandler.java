@@ -4,10 +4,12 @@ import common.Methods;
 import common.Response;
 import common.objects.Body;
 import common.objects.User;
-import server.DatabaseConnector;
+import server.database.DatabaseConnectorOld;
 import server.OnlineManager;
+import server.database.DatabaseManager;
 import server.servlet.EventSocket;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -24,8 +26,8 @@ public class HookUserStatusHandler extends AbstractHandler<User> {
     }
 
     @Override
-    protected Body onHandle(User body) throws HandleError {
-        User u = DatabaseConnector.getInstance().getUserStatus(body.getLogin());
+    protected Body onHandle(User body) throws HandleError, SQLException {
+        User u = DatabaseManager.getExtractor().getUserStatus(body.getLogin());//DatabaseConnectorOld.getInstance().getUserStatus(body.getLogin());
         u.setOnline(OnlineManager.getInstance().isOnline(body.getLogin()));
         u.setLogin(body.getLogin());
         //UserStatusHook.getInstance().addHook(body.getLogin(), new Listener(socket, body.getLogin()));
@@ -54,11 +56,16 @@ public class HookUserStatusHandler extends AbstractHandler<User> {
             Response r = new Response();
             r.setStatus(Response.OK);
             r.setType(Methods.GET_USER_STATUS);
-            User user = DatabaseConnector.getInstance().getUserStatus(login);
-            user.setOnline(bool);
-            user.setLogin(login);
-            r.setBody(user.toJSONObject());
-            socket.send(r);
+            try {
+                User user = DatabaseManager.getExtractor().getUserStatus(login);
+                user.setOnline(bool);
+                user.setLogin(login);
+                r.setBody(user.toJSONObject());
+                socket.send(r);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

@@ -1,12 +1,11 @@
 package server.core;
 
 import common.objects.Body;
-import common.objects.User;
 import common.objects.UserList;
 import common.objects.requests.FindUsersRequest;
-import server.DatabaseConnector;
+import server.database.DatabaseManager;
 
-import java.util.List;
+import java.sql.SQLException;
 
 public class FindUsersHandler extends AbstractHandler<FindUsersRequest>{
     public FindUsersHandler() {
@@ -14,10 +13,9 @@ public class FindUsersHandler extends AbstractHandler<FindUsersRequest>{
     }
 
     @Override
-    protected Body onHandle(FindUsersRequest body) throws HandleError {
-        List<User> users = DatabaseConnector.getInstance().findUsers(body.getMask());
+    protected Body onHandle(FindUsersRequest body) throws HandleError, SQLException {
         UserList userList = new UserList();
-        userList.setUsers(users);
+        userList.setUsers(DatabaseManager.getExtractor().findUsers(body.getMask()));
         return userList;
     }
 }

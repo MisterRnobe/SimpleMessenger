@@ -8,8 +8,11 @@ import common.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,6 +23,8 @@ public class UserElementController {
     private Label login, name;
     @FXML
     private AnchorPane root;
+    @FXML
+    private Circle avatar;
     private User bindUser;
 
     public AnchorPane getRoot() {
@@ -42,13 +47,18 @@ public class UserElementController {
             MainWindowManager.getInstance().createEmptyDialog(bindUser);
         e.consume();
     }
-
+    private void setPhoto(Image image)
+    {
+        if (image != null)
+            avatar.setFill(new ImagePattern(image));
+    }
     public static UserElementController create(User u) throws IOException {
         FXMLLoader loader = new FXMLLoader(UserElementController.class.getResource("UserElement.fxml"));
         loader.load();
         UserElementController controller = loader.getController();
         controller.login.setText(u.getLogin());
         controller.name.setText(u.getName());
+        controller.setPhoto(u.FXImage());
         controller.bindUser = u;
         return controller;
     }

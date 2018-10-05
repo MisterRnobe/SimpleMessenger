@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="74.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.app.main.menu.newdialog.UserElementController" fx:id="root" onMouseClicked="#onClick">
    <children>
-      <Circle fill="DODGERBLUE" radius="32.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+      <Circle fill="DODGERBLUE" radius="32.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" fx:id="avatar"/>
       <Label style="-fx-font-family: sans-serif;" text="Login" AnchorPane.leftAnchor="85.0" AnchorPane.topAnchor="5.0" fx:id="login">
          <font>
             <Font size="15.0" />

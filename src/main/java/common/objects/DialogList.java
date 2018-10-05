@@ -14,26 +14,16 @@ public class DialogList extends Body{
     private List<DialogInfo> dialogs = new ArrayList<>();
 
     public DialogList() {
-
     }
 
     public List<DialogInfo> getDialogs() {
         return dialogs;
     }
-
     public void setDialogs(List<DialogInfo> dialogs) {
         this.dialogs = dialogs;
     }
     public void addDialog(DialogInfo dialogInfo)
     {
         dialogs.add(dialogInfo);
-    }
-
-    @Override
-    public JSONObject toJSONObject() {
-        JSONArray array = dialogs.stream().map(d -> (Object) d).collect(Collectors.toCollection(JSONArray::new));
-        JSONObject o = new JSONObject();
-        o.put("dialogs", array);
-        return o;
     }
 }

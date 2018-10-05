@@ -10,6 +10,7 @@ public class RegistrationData extends Body {
     private String name;
     private String email;
     private String info;
+    private byte[] avatar;
 
     public RegistrationData() {
     }
@@ -54,14 +55,11 @@ public class RegistrationData extends Body {
         this.info = info;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject();
-        o.put("login", login);
-        o.put("password", password);
-        o.put("name", name);
-        o.put("email", email);
-        o.put("info", info);
-        return o;
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 }

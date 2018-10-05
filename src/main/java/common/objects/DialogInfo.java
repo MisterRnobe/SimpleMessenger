@@ -13,6 +13,7 @@ public class DialogInfo extends Body{
     private Message lastMessage;
     private List<User> users;
     private int unread;
+    private byte[] photo;
 
     public DialogInfo(int dialogId, String dialogName, String creator, int type) {
         this.dialogId = dialogId;
@@ -80,5 +81,13 @@ public class DialogInfo extends Body{
 
     public void setLastMessage(Message lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 }

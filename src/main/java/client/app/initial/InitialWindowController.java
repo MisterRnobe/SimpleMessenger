@@ -1,19 +1,18 @@
 package client.app.initial;
 
-import client.utils.ControllerLoader;
-import client.network.queries.AuthorizationQuery;
 import client.app.registration.RegistrationController;
+import client.network.queries.AuthorizationQuery;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 
 import java.io.*;
 
 
 public class InitialWindowController {
-    private static final String FILE_NAME = "SignInWindow.fxml";
     @FXML
     private TextField login, password;
     @FXML
@@ -62,8 +61,9 @@ public class InitialWindowController {
     {
         RegistrationController.startRegistration();
     }
-    public static Parent create() throws IOException {
-        return ControllerLoader.create(InitialWindowController.class.getResource(FILE_NAME));
+    public static Pane create() throws IOException {
+        FXMLLoader loader = new FXMLLoader(InitialWindowController.class.getResource("SignInWindow.fxml"));
+        return loader.load();
     }
 
 }

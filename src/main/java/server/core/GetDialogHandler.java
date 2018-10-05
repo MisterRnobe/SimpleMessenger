@@ -2,7 +2,10 @@ package server.core;
 
 import common.objects.Body;
 import common.objects.requests.DialogRequest;
-import server.DatabaseConnector;
+import server.database.DatabaseConnectorOld;
+import server.database.DatabaseManager;
+
+import java.sql.SQLException;
 
 public class GetDialogHandler extends AbstractHandler<DialogRequest>{
     public GetDialogHandler(String login) {
@@ -10,7 +13,7 @@ public class GetDialogHandler extends AbstractHandler<DialogRequest>{
     }
 
     @Override
-    protected Body onHandle(DialogRequest body) throws HandleError {
-        return DatabaseConnector.getInstance().getDialogById(body.getDialogId());
+    protected Body onHandle(DialogRequest body) throws HandleError, SQLException {
+        return DatabaseManager.getExtractor().getDialogById(body.getDialogId());
     }
 }

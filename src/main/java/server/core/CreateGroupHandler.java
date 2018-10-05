@@ -1,9 +1,11 @@
 package server.core;
 
-import common.Errors;
 import common.objects.Body;
 import common.objects.requests.CreateGroupRequest;
-import server.DatabaseConnector;
+import server.database.DatabaseExtractor;
+import server.database.DatabaseManager;
+
+import java.sql.SQLException;
 
 public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
 
@@ -12,15 +14,11 @@ public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
     }
 
     @Override
-    protected Body onHandle(CreateGroupRequest body) throws HandleError {
-        int dialogId = DatabaseConnector.getInstance().createGroup(login, body.getTitle(), body.getPartners());
-        if (dialogId == -1)
-            throw new HandleError(Errors.INTERNAL_ERROR);
-        else
-        {
-            int messageId = DatabaseConnector.getInstance().addMessage(dialogId, null, "Created!", System.currentTimeMillis());
-            DatabaseConnector.getInstance().setLastMessage(dialogId, messageId);
-            return DatabaseConnector.getInstance().getFullDialog(dialogId);
-        }
+    protected Body onHandle(CreateGroupRequest body) throws HandleError, SQLException {
+        DatabaseExtractor extractor = DatabaseManager.getExtractor();
+        int dialogId = extractor.createGroup(login, body.getTitle(), body.getPartners());
+        int messageId = extractor.addMessage(dialogId, null, "Created!", System.currentTimeMillis());
+        extractor.setLastMessage(dialogId, messageId);
+        return extractor.getFullDialog(dialogId);
     }
 }
