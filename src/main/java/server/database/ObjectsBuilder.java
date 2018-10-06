@@ -3,8 +3,7 @@ package server.database;
 import common.objects.DialogInfo;
 import common.objects.Message;
 import common.objects.User;
-import common.objects.UserProfile;
-import server.utils.FIleSaver;
+import server.utils.FileSaver;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,7 +26,7 @@ public class ObjectsBuilder {
         {
             if (rs.getBoolean(i))
             {
-                user.setAvatar(FIleSaver.loadAvatarFor(user.getLogin()));
+                user.setAvatarPath(FileSaver.getPathForUserAvatar(user.getLogin()));
             }
         });
 

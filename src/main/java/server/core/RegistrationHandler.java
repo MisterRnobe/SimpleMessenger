@@ -2,9 +2,8 @@ package server.core;
 
 import common.objects.Body;
 import common.objects.requests.RegistrationData;
-import server.database.DatabaseConnectorOld;
 import server.database.DatabaseManager;
-import server.utils.FIleSaver;
+import server.utils.FileSaver;
 
 import java.sql.SQLException;
 
@@ -28,7 +27,7 @@ public class RegistrationHandler extends AbstractHandler<RegistrationData> {
         checkInfo(body.getInfo());
         DatabaseManager.getExtractor().addUser(body);
         if (body.getAvatar() != null)
-            FIleSaver.saveAvatar(body.getAvatar(), body.getLogin()+".png");
+            FileSaver.saveUserAvatar(body.getAvatar(), body.getLogin());
         return Body.NULL_BODY;
     }
 

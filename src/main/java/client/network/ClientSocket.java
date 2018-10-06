@@ -5,11 +5,11 @@ import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
 import common.Response;
+import common.objects.requests.GetFileRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,7 +33,8 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.JOIN_GROUP, GroupModificationQuery::onJoinedGroup);
         handlers.put(Methods.READ_MESSAGES, ReadMessageQuery::onHandle);
         handlers.put(Methods.GET_PROFILE, GetUserProfileQuery::handle);
-        handlers.put(Methods.VERIFY_DATA, VerifyDataRequest::onHandle);
+        handlers.put(Methods.VERIFY_DATA, VerifyDataQuery::onHandle);
+        handlers.put(Methods.GET_FILE, GetFileQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {

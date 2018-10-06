@@ -156,5 +156,6 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
         handlers.put(Methods.READ_MESSAGES, r->new ReadMessagesHandler(login).handle(r));
         handlers.put(Methods.GET_PROFILE, r->new UserProfileHandler().handle(r));
+        handlers.put(Methods.GET_FILE, r->new FileHandler().handle(r));
     }
 }

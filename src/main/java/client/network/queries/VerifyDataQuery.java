@@ -9,7 +9,7 @@ import common.objects.requests.RegistrationData;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public class VerifyDataRequest {
+public class VerifyDataQuery {
     private static Consumer<Integer> callback = null;
     public static void send(String login, String password, String name, String email, String info, Consumer<Integer> callback) throws IOException
     {
@@ -21,7 +21,7 @@ public class VerifyDataRequest {
         registrationData.setName(name);
         Request request = new Request().setMethod(Methods.VERIFY_DATA).setBody(registrationData.toJSONObject());
         ClientSocket.getInstance().send(request);
-        VerifyDataRequest.callback = callback;
+        VerifyDataQuery.callback = callback;
     }
     public static void onHandle(Response response)
     {

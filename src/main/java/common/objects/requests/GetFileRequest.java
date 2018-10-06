@@ -3,13 +3,13 @@ package common.objects.requests;
 import common.objects.Body;
 
 public class GetFileRequest extends Body {
-    public String fileName;
+    private String filePath;
 
-    public String getFileName() {
-        return fileName;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

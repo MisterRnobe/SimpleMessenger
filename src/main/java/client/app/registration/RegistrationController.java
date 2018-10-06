@@ -1,7 +1,7 @@
 package client.app.registration;
 
 import client.network.queries.RegistrationQuery;
-import client.network.queries.VerifyDataRequest;
+import client.network.queries.VerifyDataQuery;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -38,7 +38,7 @@ public class RegistrationController {
     static void verify(String login, String password, String name, String email, String info)
     {
         try {
-            VerifyDataRequest.send(login, password, name, email, info, code->{
+            VerifyDataQuery.send(login, password, name, email, info, code->{
                 if (code == 0)
                     next();
                 else

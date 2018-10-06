@@ -3,8 +3,10 @@ package client.app.main.menu.newdialog;
 import client.utils.ApplicationBank;
 import client.utils.DialogBean;
 import client.app.main.MainWindowManager;
+import client.utils.FileManager;
 import common.objects.DialogInfo;
 import common.objects.User;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -49,17 +51,23 @@ public class UserElementController {
     }
     private void setPhoto(Image image)
     {
-        if (image != null)
-            avatar.setFill(new ImagePattern(image));
+        Platform.runLater(()-> {
+            if (image != null)
+                avatar.setFill(new ImagePattern(image));
+        });
+    }
+    private void setUser(User u)
+    {
+        login.setText(u.getLogin());
+        name.setText(u.getName());
+        bindUser = u;
+        FileManager.getInstance().getAvatar(u.getAvatarPath(), this::setPhoto);
     }
     public static UserElementController create(User u) throws IOException {
         FXMLLoader loader = new FXMLLoader(UserElementController.class.getResource("UserElement.fxml"));
         loader.load();
         UserElementController controller = loader.getController();
-        controller.login.setText(u.getLogin());
-        controller.name.setText(u.getName());
-        controller.setPhoto(u.FXImage());
-        controller.bindUser = u;
+        controller.setUser(u);
         return controller;
     }
 }

@@ -81,7 +81,7 @@ public class UserSelectingElementController {
         UserSelectingElementController c = loader.getController();
         c.login.setText(user.getLogin());
         c.name.setText(user.getName());
-        c.setPhoto(user.getAvatar());
+        //c.setPhoto(user.getAvatar());
         return c;
     }
 }
