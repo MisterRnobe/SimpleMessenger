@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class MySQLConnector implements DatabaseConnector {
     private Connection connection;
 
-    public MySQLConnector(Connection connection)
+    MySQLConnector(Connection connection)
     {
         this.connection = connection;
     }

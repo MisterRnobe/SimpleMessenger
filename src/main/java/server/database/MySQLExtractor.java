@@ -143,6 +143,8 @@ public class MySQLExtractor implements DatabaseExtractor {
             }
             return templateList;
         },login);
+        if (dialogList.getDialogs().size() == 0)
+            return dialogList;
         for(DialogInfo di: dialogList.getDialogs())
         {
             di.setUsers(getUsersInDialog(di.getDialogId()));
@@ -165,7 +167,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public UserProfile getUserProfile(String login) throws SQLException {
-        return connector.select("SELECT name, email, info FROM users WHERE login = ?;", resultSet -> {
+        return connector.select("SELECT login, email, info FROM users WHERE login = ?;", resultSet -> {
             UserProfile userProfile = new UserProfile();
             userProfile.setLogin(login);
             if (resultSet.next())
@@ -173,6 +175,7 @@ public class MySQLExtractor implements DatabaseExtractor {
                 userProfile.setEmail(resultSet.getString("email"));
                 userProfile.setInfo(resultSet.getString("info"));
                 userProfile.setName(resultSet.getString("name"));
+                userProfile.setLogin(resultSet.getString("login"));
             }
             return userProfile;
         }, login);

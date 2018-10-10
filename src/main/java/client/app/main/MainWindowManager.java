@@ -1,12 +1,11 @@
 package client.app.main;
 
-import client.app.main.dialog.controllers.AbstractDialogWrapper;
+import client.app.main.dialog.AbstractDialogWrapper;
 import client.utils.ApplicationBank;
 import client.utils.DialogBean;
 import client.network.queries.GetDialogQuery;
 import client.network.queries.GetDialogsQuery;
-import client.app.main.dialog.controllers.NewDialogWrapper;
-import client.app.main.menu.AbstractWindow;
+import client.app.main.dialog.NewDialogWrapper;
 import common.objects.User;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -57,7 +56,7 @@ public class MainWindowManager {
     }
     public void closeWindow()
     {
-        mainWindowController.closeWindow();
+        mainWindowController.closeTopWindow();
     }
     public void displayWindow(AbstractWindow w)
     {
@@ -65,7 +64,6 @@ public class MainWindowManager {
     }
     public void createEmptyDialog(User u)
     {
-        mainWindowController.closeWindow();
         try {
             NewDialogWrapper wrapper = new NewDialogWrapper(u);
             mainWindowController.showDialog(wrapper.getRoot());

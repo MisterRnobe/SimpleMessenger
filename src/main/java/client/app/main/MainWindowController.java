@@ -1,12 +1,11 @@
 package client.app.main;
 
 import client.Supplier;
+import client.app.main.menu.UserSearch;
 import client.utils.DialogBean;
-import client.app.main.dialog.controllers.AbstractDialogWrapper;
-import client.app.main.menu.AbstractWindow;
-import client.app.main.menu.newchannel.ChannelWindowController;
-import client.app.main.menu.newdialog.UserSearchController;
-import client.app.main.menu.newgroup.CreateGroupController;
+import client.app.main.dialog.AbstractDialogWrapper;
+import client.app.main.menu.CreateChannel;
+import client.app.main.menu.CreateGroup;
 import common.objects.Message;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class MainWindowController {
+public class MainWindowController extends AbstractMainWindow {
     @FXML
     private VBox chooserBox;
     @FXML
@@ -62,7 +61,7 @@ public class MainWindowController {
         locker.setOpacity(0.0);
         locker.setStyle("-fx-background-color: black;");
         locker.setOnMouseClicked(e->{
-            closeWindow();
+            closeTopWindow();
             e.consume();
         });
 
@@ -113,7 +112,7 @@ public class MainWindowController {
             window.attach();
         }
     }
-    public void closeWindow()
+    public void closeTopWindow()
     {
         if (replaced != null)
         {
@@ -143,21 +142,21 @@ public class MainWindowController {
     @FXML
     private void showUserSearch()
     {
-        displayWindow(UserSearchController::create);
+        displayWindow(()->new UserSearch(this));
     }
     @FXML
     private void prepareNewGroup()
     {
-        displayWindow(CreateGroupController::create);
+        displayWindow(CreateGroup::new);
     }
     @FXML
     private void prepareNewChannel()
     {
-        displayWindow(ChannelWindowController::create);
+        displayWindow(CreateChannel::new);
     }
     public void displayWindow(Supplier<AbstractWindow> supplier)
     {
-//        locker.setOnMouseClicked(e-> closeWindow());
+//        locker.setOnMouseClicked(e-> closeTopWindow());
 //        menu.setTranslateX(-menu.getPrefWidth());
         if (window != null)
         {
@@ -247,6 +246,7 @@ public class MainWindowController {
         loader.load();
         return loader.getController();
     }
+
     static class MenuWindow extends AbstractWindow
     {
         MenuWindow(AnchorPane root)

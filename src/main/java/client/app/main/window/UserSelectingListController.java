@@ -1,6 +1,5 @@
 package client.app.main.window;
 
-import client.app.main.menu.newdialog.UserElementController;
 import common.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
