@@ -1,17 +1,15 @@
 package common.objects;
 
-import com.alibaba.fastjson.JSONObject;
-
 public class FullDialog extends Body {
-    private DialogInfo dialogInfo;
+    private DialogMarker info;
     private Dialog dialog;
 
-    public DialogInfo getDialogInfo() {
-        return dialogInfo;
+    public DialogMarker getInfo() {
+        return info;
     }
 
-    public void setDialogInfo(DialogInfo dialogInfo) {
-        this.dialogInfo = dialogInfo;
+    public void setInfo(DialogMarker info) {
+        this.info = info;
     }
 
     public Dialog getDialog() {
@@ -22,11 +20,4 @@ public class FullDialog extends Body {
         this.dialog = dialog;
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        JSONObject o = new JSONObject();
-        o.put("dialogInfo", dialogInfo);
-        o.put("dialog", dialog);
-        return o;
-    }
 }

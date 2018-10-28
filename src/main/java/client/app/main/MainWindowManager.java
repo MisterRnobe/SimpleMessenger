@@ -1,72 +1,79 @@
 package client.app.main;
 
 import client.app.main.dialog.AbstractDialogWrapper;
-import client.utils.ApplicationBank;
-import client.utils.DialogBean;
+import client.app.main.dialog.NewDialogWrapper;
+import client.controllers.DialogChooserController;
+import client.controllers.MainWindowController;
 import client.network.queries.GetDialogQuery;
 import client.network.queries.GetDialogsQuery;
-import client.app.main.dialog.NewDialogWrapper;
+import client.suppliers.AbstractDialogBean;
+import client.suppliers.DialogManager;
+import client.utils.Supplier;
 import common.objects.User;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MainWindowManager {
     private static MainWindowManager instance;
-
+    private static MainWindowController mainWindow;
     public static MainWindowManager getInstance() {
         return instance;
     }
-    private MainWindowController mainWindowController;
-    private MainWindowManager(){
-        Platform.runLater(() ->
-        {
-            Stage stage = ApplicationBank.getInstance().getStage();
-            stage.setTitle("Simple messenger");
-            stage.setResizable(true);
-            try {
-                mainWindowController = MainWindowController.create();
-                Scene scene = new Scene((AnchorPane)mainWindowController.getRoot());
-                ApplicationBank.getInstance().getStage().setScene(scene);
-                ApplicationBank.getInstance().getStage().show();
-                ApplicationBank.getInstance().addDialogListener(change -> {
-                    if (change.wasAdded())
-                    {
-                        mainWindowController.addDialogInfo(change.getValueAdded());
-                    }
-                });
 
-                GetDialogsQuery.sendQuery(50);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    private final Map<Integer, AbstractDialogWrapper> dialogControllerMap = new TreeMap<>();
+    private AbstractDialogWrapper currentDialog = null;
+
+    private MainWindowManager(Stage stage) throws IOException{
+        stage.setTitle("Simple messenger");
+        initializeListeners();
+        stage.setResizable(true);
+        mainWindow = MainWindowController.create();
+        Scene scene = new Scene(mainWindow.getRoot());
+        stage.setScene(scene);
+        stage.show();
+        try {
+            GetDialogsQuery.sendQuery(50);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void start(){
-        instance = new MainWindowManager();
-
+    public static void start(Stage stage) throws IOException{
+        instance = new MainWindowManager(stage);
     }
-    public void replaceWindow(AbstractWindow w)
+
+    public void replaceWindow(Supplier<AbstractWindow> windowSupplier)
     {
-        mainWindowController.replaceWindow(w);
+        try {
+            mainWindow.replaceWindow(windowSupplier.get());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     public void closeWindow()
     {
-        mainWindowController.closeTopWindow();
+        mainWindow.closeTopWindow();
     }
-    public void displayWindow(AbstractWindow w)
+    public void displayWindow(Supplier<AbstractWindow> windowSupplier)
     {
-        mainWindowController.displayWindow(()->w);
+        try {
+            mainWindow.displayWindow(windowSupplier.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public void createEmptyDialog(User u)
     {
         try {
             NewDialogWrapper wrapper = new NewDialogWrapper(u);
-            mainWindowController.showDialog(wrapper.getRoot());
+            mainWindow.showDialog(wrapper.getRoot());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,12 +81,11 @@ public class MainWindowManager {
     }
     public int getOpenedDialogId()
     {
-        AbstractDialogWrapper w = mainWindowController.getCurrentDialog();
-        return w == null? -1:w.getDialogId();
+        return currentDialog == null? -1:currentDialog.getDialogId();
     }
     public void setDialog(int dialogId)
     {
-        DialogBean bean = ApplicationBank.getInstance().getDialogById(dialogId);
+        AbstractDialogBean bean = DialogManager.getInstance().getDialogById(dialogId);
         if (bean.messages().size() == 0) {
             try {
                 GetDialogQuery.sendQuery(dialogId);
@@ -89,8 +95,31 @@ public class MainWindowManager {
         }
         else
         {
-            mainWindowController.showDialog(bean.dialogId);
+            try {
+                AbstractDialogWrapper wrapper = dialogControllerMap.getOrDefault(dialogId, AbstractDialogWrapper.createOf(bean));
+                this.dialogControllerMap.put(bean.dialogId, wrapper);
+                Platform.runLater(()->mainWindow.showDialog(wrapper.getRoot()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+    }
+    private void initializeListeners()
+    {
+        DialogManager.getInstance().addDialogListener(change -> {
+            if (change.wasAdded())
+            {
+                AbstractDialogBean dialogBean = change.getValueAdded();
+                try {
+                    DialogChooserController chooserController = DialogChooserController.create(dialogBean);
+                    mainWindow.addDialogInfo(chooserController);
+                }catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 }

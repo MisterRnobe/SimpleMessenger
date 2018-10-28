@@ -3,7 +3,6 @@ package server.core;
 import common.Errors;
 import common.objects.Body;
 import common.objects.requests.UserPasswordData;
-import server.database.DatabaseConnectorOld;
 import server.database.DatabaseExtractor;
 import server.database.DatabaseManager;
 

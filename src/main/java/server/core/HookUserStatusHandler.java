@@ -4,7 +4,6 @@ import common.Methods;
 import common.Response;
 import common.objects.Body;
 import common.objects.User;
-import server.database.DatabaseConnectorOld;
 import server.OnlineManager;
 import server.database.DatabaseManager;
 import server.servlet.EventSocket;

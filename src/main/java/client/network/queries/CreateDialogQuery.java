@@ -1,8 +1,6 @@
 package client.network.queries;
 
-import client.utils.ApplicationBank;
 import client.network.ClientSocket;
-import client.app.main.MainWindowManager;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
@@ -47,15 +45,15 @@ public class CreateDialogQuery {
             if (sent != 0) {
                 FullDialog fullDialog =
                         JSON.parseObject(response.getBody().toJSONString(), FullDialog.class);
-                ApplicationBank.getInstance().addDialogInfo(fullDialog.getDialogInfo());
-                ApplicationBank.getInstance().addDialog(fullDialog.getDialog());
-                MainWindowManager.getInstance().setDialog(fullDialog.getDialogInfo().getDialogId());
+                //ApplicationBank.getInstance().addDialogInfo(fullDialog.getInfo());
+                //ApplicationBank.getInstance().addDialog(fullDialog.getDialog());
+                //MainWindowManager.getInstance().setDialog(fullDialog.getInfo().getDialogId());
                 sent--;
             }
             else
             {
                 DialogInfo dialogInfo = JSON.parseObject(response.getBody().toJSONString(), DialogInfo.class);
-                ApplicationBank.getInstance().addDialogInfo(dialogInfo);
+                //ApplicationBank.getInstance().addDialogInfo(dialogInfo);
             }
         }
     }

@@ -1,6 +1,6 @@
 package client.controllers.dialog;
 
-import client.Supplier;
+import client.utils.Supplier;
 import client.app.main.MainWindowManager;
 import client.app.main.AbstractWindow;
 import javafx.fxml.FXML;
@@ -63,12 +63,11 @@ public class DialogController {
     private void showInfo()
     {
         try {
-            AbstractWindow w = infoWindow.get();
-            MainWindowManager.getInstance().displayWindow(w);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            AbstractWindow w  = infoWindow.get();
+            MainWindowManager.getInstance().displayWindow(()->w);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     public void setInfoWindow(Supplier<AbstractWindow> infoWindow) {

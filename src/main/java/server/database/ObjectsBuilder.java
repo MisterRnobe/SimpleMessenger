@@ -1,8 +1,6 @@
 package server.database;
 
-import common.objects.DialogInfo;
-import common.objects.Message;
-import common.objects.User;
+import common.objects.*;
 import server.utils.FileSaver;
 
 import java.sql.ResultSet;
@@ -14,8 +12,9 @@ import java.util.TreeMap;
 public class ObjectsBuilder {
     private static final Map<String, TriConsumer<ResultSet, Integer, User>> userBuilder
             = new TreeMap<>();
-    private static final Map<String, TriConsumer<ResultSet, Integer, DialogInfo>> dialogInfoBuilder = new TreeMap<>();
+    private static final Map<String, TriConsumer<ResultSet, Integer, GroupInfo>> groupInfoBuilder = new TreeMap<>();
     private static final Map<String, TriConsumer<ResultSet, Integer, Message>> messageBuilder = new TreeMap<>();
+    private static final Map<String, TriConsumer<ResultSet, Integer, UserProfile>> profileBuilder = new TreeMap<>();
 
     static {
         userBuilder.put("login", (rs, i, user)-> user.setLogin(rs.getString(i)));
@@ -25,15 +24,18 @@ public class ObjectsBuilder {
         userBuilder.put("has_avatar",(rs,i,user)->
         {
             if (rs.getBoolean(i))
-            {
                 user.setAvatarPath(FileSaver.getPathForUserAvatar(user.getLogin()));
-            }
         });
 
-        dialogInfoBuilder.put("dialog_id", (rs,i,di)->di.setDialogId(rs.getInt(i)));
-        dialogInfoBuilder.put("creator", (rs,i,di)->di.setCreator(rs.getString(i)));
-        dialogInfoBuilder.put("dialog_name", (rs,i,di)->di.setDialogName(rs.getString(i)));
-        dialogInfoBuilder.put("type", (rs,i,di)->di.setType(rs.getInt(i)));
+        groupInfoBuilder.put("dialog_id", (rs,i,di)->di.setDialogId(rs.getInt(i)));
+        groupInfoBuilder.put("creator", (rs,i,di)->di.setCreator(rs.getString(i)));
+        groupInfoBuilder.put("dialog_name", (rs,i,di)->di.setGroupName(rs.getString(i)));
+        groupInfoBuilder.put("type", (rs,i,di)->di.setType(rs.getInt(i)));
+        groupInfoBuilder.put("user_count", (rs,i,di)->di.setUsersCount(rs.getInt(i)));
+        groupInfoBuilder.put("has_photo", (rs,i,di)->{
+            if (rs.getBoolean(i))
+                di.setAvatarPath(FileSaver.getPathForGroupAvatar(di.getDialogId()));
+        });
 
         messageBuilder.put("dialog_id", (rs,i,m)->m.setDialogId(rs.getInt(i)));
         messageBuilder.put("text", (rs,i,m)->m.setText(rs.getString(i)));
@@ -42,17 +44,33 @@ public class ObjectsBuilder {
         messageBuilder.put("is_system", (rs,i,m)->m.setIsSystem(rs.getBoolean(i)));
         messageBuilder.put("sender", (rs,i,m)->m.setSender(rs.getString(i)));
 
+        profileBuilder.put("login", (rs, i, profile)-> profile.setLogin(rs.getString(i)));
+        profileBuilder.put("name", (rs, i, profile)-> profile.setName(rs.getString(i)));
+        profileBuilder.put("email", (rs, i, profile)-> profile.setEmail(rs.getString(i)));
+        profileBuilder.put("info", (rs, i, profile)-> profile.setInfo(rs.getString(i)));
+        profileBuilder.put("has_avatar",(rs,i,profile)->
+        {
+            if (rs.getBoolean(i))
+            {
+                profile.setAvatarPath(FileSaver.getPathForUserAvatar(profile.getLogin()));
+            }
+        });
+
+    }
+    static GroupInfo buildGroupInfo(ResultSet resultSet) throws SQLException
+    {
+        return build(resultSet, groupInfoBuilder, new GroupInfo());
     }
     public static User buildUser(ResultSet resultSet) throws SQLException {
         return build(resultSet, userBuilder, new User());
     }
-    public static DialogInfo buildDialogInfo(ResultSet resultSet) throws SQLException
-    {
-        return build(resultSet, dialogInfoBuilder, new DialogInfo());
-    }
     public static Message buildMessage(ResultSet resultSet) throws SQLException
     {
         return build(resultSet, messageBuilder, new Message());
+    }
+    public static UserProfile buildProfile(ResultSet resultSet) throws SQLException
+    {
+        return build(resultSet, profileBuilder, new UserProfile());
     }
     private static<E> E build(ResultSet resultSet, Map<String, TriConsumer<ResultSet, Integer, E>> map, E object) throws SQLException
     {

@@ -29,7 +29,7 @@ public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
         }
         int messageId = extractor.addMessage(dialogId, creator, initialMessage, System.currentTimeMillis());
         extractor.setLastMessage(dialogId, messageId);
-        return extractor.getFullDialog(dialogId);
+        return extractor.getFullDialog(dialogId, login);
     }
 
     @Override

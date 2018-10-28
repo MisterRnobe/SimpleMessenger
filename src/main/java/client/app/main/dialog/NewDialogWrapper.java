@@ -10,7 +10,7 @@ public class NewDialogWrapper extends AbstractDialogWrapper {
     private User user;
 
     public NewDialogWrapper(User user) throws IOException {
-        super(-1);
+        super(null);
         this.user = user;
         bindUser();
     }

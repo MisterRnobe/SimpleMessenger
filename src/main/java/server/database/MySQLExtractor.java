@@ -1,22 +1,24 @@
 package server.database;
 
 import common.objects.*;
-import common.objects.requests.*;
+import common.objects.requests.DialogTypes;
+import common.objects.requests.RegistrationData;
+import common.objects.requests.UserPasswordData;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static server.database.ObjectsBuilder.buildGroupInfo;
 import static server.database.ObjectsBuilder.buildMessage;
 import static server.database.ObjectsBuilder.buildUser;
-import static server.database.ObjectsBuilder.buildDialogInfo;
 
 public class MySQLExtractor implements DatabaseExtractor {
     private DatabaseConnector connector;
 
-    public MySQLExtractor(DatabaseConnector connector) {
+    MySQLExtractor(DatabaseConnector connector) {
         this.connector = connector;
     }
 
@@ -40,7 +42,7 @@ public class MySQLExtractor implements DatabaseExtractor {
                 .add("email", registrationData.getEmail())
                 .add("info", registrationData.getInfo())
                 .add("has_avatar", registrationData.getAvatar() != null? "1":"0"));
-        connector.insert("users", CustomMap.create()
+        connector.insert("online", CustomMap.create()
                 .add("login", registrationData.getLogin())
                 .add("last_online", Long.toString(System.currentTimeMillis()))
                 .add("online", "0"));
@@ -51,7 +53,7 @@ public class MySQLExtractor implements DatabaseExtractor {
         int dialogId = connector.insert("dialogs", CustomMap.create()
                         .add("dialog_name", title)
                         .add("creator", creator)
-                        .add("type", Integer.toString(DialogInfo.GROUP)));
+                        .add("type", Integer.toString(DialogTypes.GROUP)));
         if (dialogId == -1)
             return dialogId;
         connector.insert("user_dialog", CustomMap.create()
@@ -70,7 +72,7 @@ public class MySQLExtractor implements DatabaseExtractor {
         int dialogId = connector.insert("dialogs",CustomMap.create()
                 .add("dialog_name", title)
                 .add("creator", creator)
-                .add("type", Integer.toString(DialogInfo.CHANNEL)));
+                .add("type", Integer.toString(DialogTypes.CHANNEL)));
         if (dialogId == -1)
             throw new SQLException();
         connector.insert("user_dialog",CustomMap.create()
@@ -89,7 +91,7 @@ public class MySQLExtractor implements DatabaseExtractor {
     public int createDialog(String creator, String partner) throws SQLException {
         int dialogId = connector.insert("dialogs",CustomMap.create()
                 .add("creator", creator)
-                .add("type", Integer.toString(DialogInfo.DIALOG)));
+                .add("type", Integer.toString(DialogTypes.DIALOG)));
         if (dialogId == -1)
             return dialogId;
         connector.insert("user_dialog", CustomMap.create()
@@ -103,7 +105,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public List<User> getUsersInDialog(Integer dialogId) throws SQLException {
-        String query = "SELECT u.login, u.name FROM user_dialog AS u_d LEFT JOIN users AS u ON u_d.login = u.login WHERE dialog_id = ?;";
+        String query = "SELECT u.login as login, u.name as name, u.has_avatar as has_avatar FROM user_dialog AS u_d LEFT JOIN users AS u ON u_d.login = u.login WHERE dialog_id = ?;";
         return connector.select(query, resultSet -> {
             List<User> users = new LinkedList<>();
             while (resultSet.next()) {
@@ -127,10 +129,24 @@ public class MySQLExtractor implements DatabaseExtractor {
             }, sqlMask, sqlMask);
     }
 
-
     @Override
-    public DialogList getDialogs(String login, Integer count) throws SQLException {
-        String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type as type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = ? ORDER BY time LIMIT "+count+";";
+    public List<DialogMarker> getDialogs(String login, Integer count) throws SQLException {
+        String query = "SELECT d.dialog_id AS dialog_id, d.type as type from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = ? ORDER BY time LIMIT "+count+";";
+        Map<Integer, Integer> dialogIdsTypes = connector.select(query, rs->
+        {
+            Map<Integer, Integer> map = new TreeMap<>();
+            while (rs.next())
+                map.put(rs.getInt("dialog_id"), rs.getInt("type"));
+            return map;
+        }, login);
+        List<Integer> dialogIds = dialogIdsTypes.entrySet().stream().filter(e->e.getValue() == DialogTypes.DIALOG).map(Map.Entry::getKey).collect(Collectors.toList());
+        List<Integer> groupIds = dialogIdsTypes.entrySet().stream().filter(e->e.getValue() != DialogTypes.DIALOG).map(Map.Entry::getKey).collect(Collectors.toList());
+
+        List<DialogMarker> dialogs = getAsDialog(dialogIds, login), groups = getAsGroup(groupIds, login);
+        dialogs.addAll(groups);
+        return dialogs;
+
+        /*String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type as type, d.has_photo as has_photo, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = ? ORDER BY time LIMIT "+count+";";
 
         DialogList dialogList = connector.select(query, rs->{
             DialogList templateList = new DialogList();
@@ -162,20 +178,16 @@ public class MySQLExtractor implements DatabaseExtractor {
             }
             return null;
         },login);
-        return dialogList;
+        return dialogList;*/
     }
 
     @Override
     public UserProfile getUserProfile(String login) throws SQLException {
-        return connector.select("SELECT login, email, info FROM users WHERE login = ?;", resultSet -> {
+        return connector.select("SELECT login, email, info, name, has_avatar FROM users WHERE login = ?;", resultSet -> {
             UserProfile userProfile = new UserProfile();
-            userProfile.setLogin(login);
             if (resultSet.next())
             {
-                userProfile.setEmail(resultSet.getString("email"));
-                userProfile.setInfo(resultSet.getString("info"));
-                userProfile.setName(resultSet.getString("name"));
-                userProfile.setLogin(resultSet.getString("login"));
+                userProfile = ObjectsBuilder.buildProfile(resultSet);
             }
             return userProfile;
         }, login);
@@ -263,8 +275,27 @@ public class MySQLExtractor implements DatabaseExtractor {
     }
 
     @Override
-    public FullDialog getFullDialog(Integer dialogId) throws SQLException {
-        String query = "SELECT d.dialog_id as dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type AS type, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id = ?;";
+    public FullDialog getFullDialog(Integer dialogId, String login) throws SQLException {
+        //Extracting type
+        String query = "SELECT type FROM dialogs WHERE dialog_id = ?;";
+        Integer type = connector.select(query, rs -> {
+            if (rs.next())
+                return rs.getInt(1);
+            else
+                return -1;
+        }, dialogId.toString());
+        if (type == -1)
+            throw new SQLException("GROUP "+dialogId+" NOT FOUND!");
+        List<Integer> id = new LinkedList<>();
+        id.add(type);
+        //According to its type, extracting info
+        DialogMarker dialog = (type == DialogTypes.DIALOG? getAsDialog(id, login): getAsGroup(id, login)).get(0);
+        FullDialog fullDialog = new FullDialog();
+        fullDialog.setDialog(getDialogById(dialogId));
+        fullDialog.setInfo(dialog);
+
+        return fullDialog;
+        /*String query = "SELECT d.dialog_id as dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type AS type, d.has_photo as has_photo, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id = ?;";
         DialogInfo dialogInfo = connector.select(query, rs -> {
             DialogInfo di = null;
             if (rs.next()) {
@@ -276,9 +307,9 @@ public class MySQLExtractor implements DatabaseExtractor {
         }, Integer.toString(dialogId));
         dialogInfo.setUsers(getUsersInDialog(dialogId));
         FullDialog fullDialog = new FullDialog();
-        fullDialog.setDialogInfo(dialogInfo);
+        fullDialog.setInfo(dialogInfo);
         fullDialog.setDialog(getDialogById(dialogId));
-        return fullDialog;
+        return fullDialog;*/
     }
 
     @Override
@@ -317,6 +348,77 @@ public class MySQLExtractor implements DatabaseExtractor {
             return this;
         }
     }
+    private List<DialogMarker> getAsDialog(List<Integer> dialogIds, String login) throws SQLException
+    {
+        //Extracting info
+        String wrappedIds = dialogIds.stream().map(Object::toString).collect(Collectors.joining(",", "(", ")"));
+        String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.last_message_id as message_id, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id in "+wrappedIds+";";
+        List<DialogInfo> infos =  connector.select(query, rs->{
+            List<DialogInfo> dialogMarkers = new LinkedList<>();
+            while (rs.next())
+            {
+                DialogInfo dialogInfo = new DialogInfo();
+                dialogInfo.setType(DialogTypes.DIALOG).setDialogId(rs.getInt("dialog_id"))
+                        .setLastMessage(ObjectsBuilder.buildMessage(rs));
+                dialogMarkers.add(dialogInfo);
+            }
+            return dialogMarkers;
+        });
+        //Extracting a partner
+        query = "SELECT u.login AS login, u.name AS name, u.has_avatar AS has_avatar, u_d.dialog_id as dialog_id FROM user_dialog AS u_d LEFT JOIN users AS u ON u_d.login = u.login WHERE u_d.dialog_id IN "+wrappedIds+" AND u_d.login <> ?;";
+        final Map<Integer, User> partners = connector.select(query, rs->{
+            Map<Integer, User> map = new TreeMap<>();
+            while (rs.next())
+            {
+                map.put(rs.getInt("dialog_id"), buildUser(rs));
+            }
+            return map;
+        }, login);
+        //Extracting count of unread messages
+        query = "SELECT m.dialog_id AS dialog_id, count(*) AS count FROM messages as m LEFT JOIN unread_messages AS u_m ON m.message_id = u_m.message_id WHERE u_m.login = ? AND m.dialog_id IN "+wrappedIds+" GROUP BY m.dialog_id;";
+        final Map<Integer, Integer> unread = connector.select(query, rs->{
+            Map<Integer, Integer> map = new TreeMap<>();
+            while (rs.next())
+                map.put(rs.getInt("dialog_id"), rs.getInt("count"));
+            return map;
+        }, login);
+        //Joining
+        infos.forEach(di->{
+            di.setPartner(partners.get(di.getDialogId()));
+            di.setUnread(unread.getOrDefault(di.getDialogId(), 0));
+        });
+        return new LinkedList<>(infos);
+    }
+    private List<DialogMarker> getAsGroup(List<Integer> dialogIds, String login) throws SQLException
+    {
+        //Extracting info
+        String wrappedIds = dialogIds.stream().map(Object::toString).collect(Collectors.joining(",", "(", ")"));
+        String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.type AS type, d.has_photo AS has_photo, count(*) AS user_count, m.message_id AS message_id, m.sender AS sender, m.text AS text, m.time AS time, m.is_system AS is_system FROM dialogs AS d LEFT JOIN messages AS m ON d.last_message_id=m.message_id LEFT JOIN user_dialog AS u_d ON u_d.dialog_id = d.dialog_id WHERE d.dialog_id IN "+wrappedIds+" GROUP BY dialog_id;";
+        List<GroupInfo> groupInfos = connector.select(query, rs->{
+            List<GroupInfo> list = new LinkedList<>();
+            while (rs.next())
+            {
+               Message last = buildMessage(rs);
+               GroupInfo groupInfo = buildGroupInfo(rs).setLastMessage(last);
+               list.add(groupInfo);
+            }
+            return list;
+        });
+        //Extracting count of unread messages
+        query = "SELECT m.dialog_id AS dialog_id, count(*) AS count FROM messages as m LEFT JOIN unread_messages AS u_m ON m.message_id = u_m.message_id WHERE u_m.login = ? AND m.dialog_id IN "+wrappedIds+" GROUP BY m.dialog_id;";
+        final Map<Integer, Integer> unread = connector.select(query, rs->{
+            Map<Integer, Integer> map = new TreeMap<>();
+            while (rs.next()) {
+                map.put(rs.getInt("dialog_id"), rs.getInt("count"));
+            }
+            return map;
+        }, login);
+        //Joining
+        groupInfos.forEach(gi-> {
+            gi.setUsersCount(unread.getOrDefault(gi.getDialogId(), 0));
+        });
+        return new LinkedList<>(groupInfos);
+    }
     private static String hash256(String data) {
 
         try {
@@ -328,7 +430,7 @@ public class MySQLExtractor implements DatabaseExtractor {
         }
     }
     private static String bytesToHex(byte[] bytes) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
         return result.toString();
     }

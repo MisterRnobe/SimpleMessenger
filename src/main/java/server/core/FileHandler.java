@@ -13,7 +13,7 @@ public class FileHandler extends AbstractHandler<GetFileRequest> {
     }
 
     @Override
-    protected Body onHandle(GetFileRequest body) throws HandleError, SQLException {
+    protected Body onHandle(GetFileRequest body) throws HandleError {
         byte[] bytes = FileSaver.loadAvatar(body.getFilePath());
         File f = new File();
         f.setFile(bytes);

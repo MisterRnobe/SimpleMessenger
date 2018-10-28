@@ -1,11 +1,9 @@
-package client.app.main;
+package client.controllers;
 
-import client.Supplier;
-import client.app.main.menu.UserSearch;
-import client.utils.DialogBean;
-import client.app.main.dialog.AbstractDialogWrapper;
+import client.app.main.AbstractWindow;
 import client.app.main.menu.CreateChannel;
 import client.app.main.menu.CreateGroup;
+import client.app.main.menu.UserSearch;
 import common.objects.Message;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -14,7 +12,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -23,15 +20,14 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
 
 
-public class MainWindowController extends AbstractMainWindow {
+public class MainWindowController {
     @FXML
     private VBox chooserBox;
     @FXML
-    private AnchorPane root;
+    private Pane root;
+
     @FXML
     private AnchorPane dialogPane;
     @FXML
@@ -43,16 +39,12 @@ public class MainWindowController extends AbstractMainWindow {
     private AbstractWindow window, replaced;
     private MenuWindow menuWindow;
 
-
-    private final Map<Integer, AbstractDialogWrapper> dialogControllerMap = new TreeMap<>();
-    private AbstractDialogWrapper currentDialog = null;
     private static final double ANIMATION_TIME = 1/5d;
 
     @FXML
-    private void initialize()
+    protected void initialize()
     {
         locker = new AnchorPane();
-
         AnchorPane.setBottomAnchor(locker, 0d);
         AnchorPane.setTopAnchor(locker, 0d);
         AnchorPane.setLeftAnchor(locker, 0d);
@@ -83,7 +75,7 @@ public class MainWindowController extends AbstractMainWindow {
     @FXML
     private void showMenu()
     {
-        displayWindow(()->menuWindow);
+        displayWindow(menuWindow);
     }
     @FXML
     private void onEnter(MouseEvent e)
@@ -99,18 +91,16 @@ public class MainWindowController extends AbstractMainWindow {
         pane.setStyle("-fx-background-color: rgba(255,255,255,0);");
         e.consume();
     }
-    public void replaceWindow(AbstractWindow w)
-    {
-        if (window == null)
-            displayWindow(()->w);
-        else
-        {
-            replaced = window;
-            window = w;
-            root.getChildren().remove(replaced.getRoot());
-            root.getChildren().add(window.getRoot());
-            window.attach();
+    public void replaceWindow(AbstractWindow newWindow) {
+        if (window == null) {
+            displayWindow(newWindow);
+            return;
         }
+        replaced = window;
+        window = newWindow;
+        root.getChildren().remove(replaced.getRoot());
+        root.getChildren().add(window.getRoot());
+        window.attach();
     }
     public void closeTopWindow()
     {
@@ -142,29 +132,37 @@ public class MainWindowController extends AbstractMainWindow {
     @FXML
     private void showUserSearch()
     {
-        displayWindow(()->new UserSearch(this));
+        try {
+            displayWindow(new UserSearch());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
     private void prepareNewGroup()
     {
-        displayWindow(CreateGroup::new);
+        try {
+            displayWindow(new CreateGroup());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
     private void prepareNewChannel()
     {
-        displayWindow(CreateChannel::new);
+        try {
+            displayWindow(new CreateChannel());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public void displayWindow(Supplier<AbstractWindow> supplier)
+    public void displayWindow(AbstractWindow newWindow)
     {
-//        locker.setOnMouseClicked(e-> closeTopWindow());
-//        menu.setTranslateX(-menu.getPrefWidth());
         if (window != null)
         {
             root.getChildren().remove(window.getRoot());
         }
-        try {
-            AbstractWindow prepared = supplier.get();
-            Pane p = prepared.getRoot();
+            Pane p = newWindow.getRoot();
 
             if (window == null)
             {
@@ -173,9 +171,9 @@ public class MainWindowController extends AbstractMainWindow {
             }
             root.getChildren().add(p);
 
-            Timeline open = prepared.getOnOpen();
+            Timeline open = newWindow.getOnOpen();
             if (open == null) {
-                prepared.attach();
+                newWindow.attach();
             }
             else
             {
@@ -186,59 +184,29 @@ public class MainWindowController extends AbstractMainWindow {
                     transition.play();
                 }
             }
-            window = prepared;
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+            window = newWindow;
+
     }
 
-    public AbstractDialogWrapper getCurrentDialog() {
-        return currentDialog;
-    }
 
-    public void addDialogInfo(DialogBean dialogInfo)
+    public void addDialogInfo(DialogChooserController controller)
     {
+
         Platform.runLater(()-> {
-            try {
-                DialogChooserController controller = DialogChooserController.create(dialogInfo);
-                chooserBox.getChildren().add(1,controller.getPane());
-                controller.setOnMessageReceived(this::onNewMessage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            chooserBox.getChildren().add(1,controller.getPane());
+            controller.setOnMessageReceived(this::onNewMessage);
         });
     }
-    void showDialog(Parent p)
+    public void showDialog(Parent p)
     {
         dialogPane.getChildren().clear();
         dialogPane.getChildren().add(p);
     }
 
-    public void showDialog(int dialogId)
-    {
-        Platform.runLater(()-> {
-            try {
-                AbstractDialogWrapper c = dialogControllerMap.get(dialogId);
-                if (c == null) {
-                    c = AbstractDialogWrapper.createOf(dialogId);
-                    dialogControllerMap.put(dialogId, c);
-                }
-                showDialog(c.getRoot());
-                currentDialog = c;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
     private void onNewMessage(DialogChooserController c, Message m)
     {
         chooserBox.getChildren().remove(c.getPane());
         chooserBox.getChildren().add(1, c.getPane());
-    }
-
-    public Node getRoot()
-    {
-        return root;
     }
     public static MainWindowController create() throws IOException
     {
@@ -276,6 +244,10 @@ public class MainWindowController extends AbstractMainWindow {
             };
             this.onClose = new Timeline(slide);
         }
+    }
+    public Pane getRoot()
+    {
+        return root;
     }
 
 }

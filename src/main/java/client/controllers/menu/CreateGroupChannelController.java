@@ -1,9 +1,9 @@
 package client.controllers.menu;
 
-import client.app.main.MainWindowManager;
 import client.app.main.AbstractWindow;
+import client.app.main.MainWindowManager;
 import client.controllers.UserListController;
-import client.utils.ApplicationBank;
+import client.suppliers.UserSupplier;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
@@ -46,7 +46,7 @@ public class CreateGroupChannelController extends AbstractWindow
     }
     private void init() throws IOException {
         listController = UserListController.create();
-        listController.setUserList(ApplicationBank.getInstance().getFriendList());
+        listController.setUserList(UserSupplier.getInstance().getFriendList());
         listController.setSize(300, 300).setTextListener(listController::filter).setSelectable(true);
         empty.getChildren().add(listController.getRoot());
     }

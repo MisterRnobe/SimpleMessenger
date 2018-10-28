@@ -18,6 +18,6 @@ public class CreateChannelHandler extends AbstractHandler<CreateGroupRequest>{
         int dialogId = extractor.createChannel(login, body.getTitle(), body.getPartners());
         int messageId = extractor.addMessage(dialogId, null, "Created!", System.currentTimeMillis());
         extractor.setLastMessage(dialogId, messageId);
-        return extractor.getFullDialog(dialogId);
+        return extractor.getFullDialog(dialogId, login);
     }
 }

@@ -1,7 +1,7 @@
-package client;
+package client.utils;
 
 @FunctionalInterface
 public interface Supplier<T>
 {
-    T get() throws Throwable;
+    T get() throws Exception;
 }

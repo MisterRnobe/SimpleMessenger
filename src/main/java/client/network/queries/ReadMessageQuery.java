@@ -1,7 +1,7 @@
 package client.network.queries;
 
 import client.network.ClientSocket;
-import client.utils.ApplicationBank;
+import client.suppliers.DialogManager;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
@@ -22,7 +22,7 @@ public class ReadMessageQuery {
         if (r.getStatus() == Response.OK)
         {
             ReadMessages m = JSON.parseObject(r.getBody().toJSONString(), ReadMessages.class);
-            ApplicationBank.getInstance().getDialogById(m.getDialogId()).readMessages();
+            DialogManager.getInstance().readMessages(m.getDialogId());
         }
     }
 }

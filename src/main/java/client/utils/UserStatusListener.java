@@ -2,16 +2,13 @@ package client.utils;
 
 import common.objects.User;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class UserStatusListener {
     private static final UserStatusListener instance = new UserStatusListener();
-    private final Map<String, List<Consumer<User>>> handlers = new TreeMap<>();
-
+    //private final Map<String, List<Consumer<User>>> handlers = new TreeMap<>();
+    private final CallbackMap<User> handlers = new CallbackMap<>();
     private UserStatusListener()
     {}
     public void acceptUser(User u)
@@ -29,7 +26,7 @@ public class UserStatusListener {
         }
         else
         {
-            handlers.put(login, Arrays.asList(handler));
+            handlers.put(login, handler);
         }
     }
     public boolean exist(String login)

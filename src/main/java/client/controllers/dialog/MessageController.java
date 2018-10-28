@@ -1,11 +1,13 @@
 package client.controllers.dialog;
 
 import client.network.queries.GetUserQuery;
-import client.utils.ApplicationBank;
-import client.utils.DialogBean;
-import common.objects.DialogInfo;
+import client.suppliers.AbstractDialogBean;
+import client.suppliers.DialogManager;
+import client.suppliers.UserSupplier;
 import common.objects.Message;
 import common.objects.User;
+import common.objects.requests.DialogTypes;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -51,7 +53,7 @@ public class MessageController {
             vBox.setAlignment(Pos.CENTER);
         }
 
-        else if (m.getSender().equals(ApplicationBank.getInstance().getLogin()))
+        else if (m.getSender().equals(UserSupplier.getInstance().getMyLogin()))
         {
             vBox.getChildren().remove(senderLabel);
             box.setAlignment(Pos.BASELINE_RIGHT);
@@ -61,24 +63,15 @@ public class MessageController {
         {
             box.setAlignment(Pos.BASELINE_LEFT);
             vBox.setAlignment(Pos.TOP_LEFT);
-            DialogBean b = ApplicationBank.getInstance().getDialogById(m.getDialogId());
-            if (b.type == DialogInfo.DIALOG)
+            AbstractDialogBean b = DialogManager.getInstance().getDialogById(m.getDialogId());
+            if (b.type == DialogTypes.DIALOG)
                 vBox.getChildren().remove(senderLabel);
-            else if (b.type == DialogInfo.GROUP) {
-                User u = ApplicationBank.getInstance().getUserByLogin(m.getSender());
-                if (u == null) {
-                    try {
-                        GetUserQuery.requireUser(m.getSender(), this::setUser);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else
-                    setUser(u);
+            else if (b.type == DialogTypes.GROUP) {
+                UserSupplier.getInstance().supply(m.getSender(), u-> Platform.runLater(()->setUser(u)));
             }
             else
             {
-                senderLabel.setText(b.titleProperty().getValue()+" :");
+                senderLabel.setText(b.title().getValue()+" :");
             }
         }
 

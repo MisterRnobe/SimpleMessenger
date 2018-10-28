@@ -1,28 +1,25 @@
 package common.objects;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 public class DialogList extends Body{
-    private List<DialogInfo> dialogs = new ArrayList<>();
+    private List<DialogMarker> dialogs = new ArrayList<>();
 
     public DialogList() {
     }
 
-    public List<DialogInfo> getDialogs() {
+    public List<DialogMarker> getDialogs() {
         return dialogs;
     }
-    public void setDialogs(List<DialogInfo> dialogs) {
+
+    public DialogList setDialogs(List<DialogMarker> dialogs) {
         this.dialogs = dialogs;
+        return this;
     }
-    public void addDialog(DialogInfo dialogInfo)
+
+    public void addDialog(DialogMarker dialogInfo)
     {
         dialogs.add(dialogInfo);
     }

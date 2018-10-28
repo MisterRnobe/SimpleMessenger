@@ -2,7 +2,6 @@ package server.core;
 
 import common.objects.Body;
 import common.objects.requests.DialogRequest;
-import server.database.DatabaseConnectorOld;
 import server.database.DatabaseManager;
 
 import java.sql.SQLException;

@@ -1,24 +1,20 @@
 package client.controllers.dialog.info;
 
-import client.app.main.MainWindowManager;
 import client.app.main.AbstractWindow;
-import client.app.main.window.UserSelectingListController;
+import client.app.main.MainWindowManager;
 import client.controllers.UserListController;
 import client.network.queries.GroupModificationQuery;
-import client.utils.ApplicationBank;
-import client.utils.DialogBean;
+import client.suppliers.DialogManager;
+import client.suppliers.GroupBean;
+import client.suppliers.UserSupplier;
 import common.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class AddUsersToGroupController extends AbstractWindow {
     @FXML
@@ -60,9 +56,11 @@ public class AddUsersToGroupController extends AbstractWindow {
     }
     private List<User> getFriendsList(int dialogId)
     {
-        DialogBean bindDialog = ApplicationBank.getInstance().getDialogById(dialogId);
-        List<User> partners = bindDialog.getPartners().stream().map(s->ApplicationBank.getInstance().getUserByLogin(s)).collect(Collectors.toList());
-        List<User> friends = ApplicationBank.getInstance().getFriendList();
+        //DialogBean bindDialog = ApplicationBank.getInstance().getDialogById(dialogId);
+        //DialogBean bindDialog = DialogManager.getInstance().getDialogById(dialogId);
+        //List<User> partners = bindDialog.getPartners().stream().map(s->ApplicationBank.getInstance().getUserByLogin(s)).collect(Collectors.toList());
+        List<User> partners = ((GroupBean)DialogManager.getInstance().getDialogById(dialogId)).getMembers();
+        List<User> friends = UserSupplier.getInstance().getFriendList();
         friends.removeAll(partners);
         return friends;
     }

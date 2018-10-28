@@ -1,5 +1,6 @@
 package client.app.initial;
 
+import client.app.ApplicationManager;
 import client.app.registration.RegistrationController;
 import client.network.queries.AuthorizationQuery;
 import javafx.fxml.FXML;
@@ -42,8 +43,11 @@ public class InitialWindowController {
     @FXML
     private void onSignIn()
     {
+        errorLabel.setText("");
         try {
-            AuthorizationQuery.sendLoginAndPassword(login.getText(), password.getText());
+            AuthorizationQuery
+                    .sendLoginAndPassword(login.getText(), password.getText(),
+                            ApplicationManager::launchMainWindow, this::onFail);
             if (remember.isSelected())
             {
                 try(BufferedWriter w = new BufferedWriter(new FileWriter("login.txt")))
@@ -54,6 +58,10 @@ public class InitialWindowController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private void onFail(Integer code)
+    {
+        errorLabel.setText("Ошибка: "+code);
     }
 
     @FXML

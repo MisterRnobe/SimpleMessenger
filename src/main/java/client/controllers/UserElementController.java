@@ -1,25 +1,17 @@
 package client.controllers;
 
-import client.utils.ApplicationBank;
-import client.utils.DialogBean;
-import client.app.main.MainWindowManager;
-import client.utils.FileManager;
-import common.objects.DialogInfo;
+import client.utils.AvatarSupplier;
 import common.objects.User;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class UserElementController {
@@ -56,13 +48,15 @@ public class UserElementController {
         login.setText(u.getLogin());
         name.setText(u.getName());
         bindUser = u;
-        FileManager.getInstance().getAvatar(u.getAvatarPath(), this::setPhoto);
+        if (u.getAvatarPath() != null)
+            AvatarSupplier.getInstance().getAvatar(u.getAvatarPath(), this::setPhoto);
+        else
+            this.setPhoto(AvatarSupplier.paintDefaultAvatar(u.getName()));
     }
     void setSelectable(Consumer<? super String> onSelect, Consumer<? super String> onDeselect)
     {
         root.setOnMouseClicked(e->
         {
-            System.out.println("CLICKED!");
             if (selected)
             {
                 onDeselect.accept(bindUser.getLogin());

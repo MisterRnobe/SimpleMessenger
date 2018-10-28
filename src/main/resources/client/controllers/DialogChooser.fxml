@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane fx:id="pane" maxHeight="60.0" onMouseClicked="#onMouseClicked" onMouseEntered="#onMouseEnter" onMouseExited="#onMouseExit" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.app.main.DialogChooserController">
+<AnchorPane fx:id="pane" maxHeight="60.0" onMouseClicked="#onMouseClicked" onMouseEntered="#onMouseEnter" onMouseExited="#onMouseExit" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.DialogChooserController">
         <children>
       <Label AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="65.0" AnchorPane.topAnchor="30.0" fx:id="unreadCount"/>
             <Label fx:id="title" text="Name" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="85.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />

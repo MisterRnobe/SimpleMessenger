@@ -2,7 +2,6 @@ package server.core;
 
 import common.objects.Body;
 import common.objects.Message;
-import server.database.DatabaseConnectorOld;
 import server.database.DatabaseExtractor;
 import server.database.DatabaseManager;
 

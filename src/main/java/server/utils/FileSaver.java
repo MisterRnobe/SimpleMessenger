@@ -9,6 +9,7 @@ public class FileSaver {
     private static final String HOME_FOLDER = "D:/files/";
     private static final String AVATAR_FOLDER = "avatars/";
     private static final String USER_AVATAR_FOLDER = "usr/";
+    private static final String GROUP_AVATAR_FOLDER = "grp/";
     private static final String AVATAR_FORMAT = ".png";
     public static void saveUserAvatar(byte[] avatar, String name)
     {
@@ -21,6 +22,10 @@ public class FileSaver {
     public static String getPathForUserAvatar(String login)
     {
         return AVATAR_FOLDER + USER_AVATAR_FOLDER + login + AVATAR_FORMAT;
+    }
+    public static String getPathForGroupAvatar(Integer dialogId)
+    {
+        return AVATAR_FOLDER + GROUP_AVATAR_FOLDER + dialogId + AVATAR_FORMAT;
     }
     public static byte[] loadAvatar(String path)
     {

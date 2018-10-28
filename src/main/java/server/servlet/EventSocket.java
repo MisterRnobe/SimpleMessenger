@@ -9,7 +9,6 @@ import common.Response;
 import common.objects.User;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import server.database.DatabaseConnectorOld;
 import server.OnlineManager;
 import server.core.*;
 import server.database.DatabaseManager;
@@ -153,9 +152,10 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
         handlers.put(Methods.HOOK_USER_STATUS, r-> new HookUserStatusHandler(this).handle(r));
         handlers.put(Methods.FIND_USERS, r-> new FindUsersHandler().handle(r));
-        handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
+        //handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
         handlers.put(Methods.READ_MESSAGES, r->new ReadMessagesHandler(login).handle(r));
         handlers.put(Methods.GET_PROFILE, r->new UserProfileHandler().handle(r));
         handlers.put(Methods.GET_FILE, r->new FileHandler().handle(r));
+        handlers.put(Methods.GET_USER, r->new GetUserHandler().handle(r));
     }
 }

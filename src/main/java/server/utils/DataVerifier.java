@@ -1,7 +1,6 @@
 package server.utils;
 
 import common.Errors;
-import server.database.DatabaseConnectorOld;
 import server.core.HandleError;
 
 import java.util.regex.Matcher;
@@ -16,8 +15,8 @@ public class DataVerifier {
             throw new HandleError(Errors.SHORT_LOGIN);
         if (!check(login, "^[A-z0-9_-]{5,15}$"))
             throw new HandleError(Errors.WRONG_LOGIN_SYMBOLS);
-        if (DatabaseConnectorOld.getInstance().checkUserExistence("login", login))
-            throw new HandleError(Errors.LOGIN_EXISTS);
+        //if (DatabaseConnectorOld.getInstance().checkUserExistence("login", login))
+            //throw new HandleError(Errors.LOGIN_EXISTS);
 
     }
     public static void checkPassword(String password)
@@ -40,8 +39,8 @@ public class DataVerifier {
     {
         if (!check(email, "^[-\\w.]+@([A-z0-9][-A-z0-9]+\\.)+[A-z]{2,4}$"))
             throw new HandleError(Errors.WRONG_MAIL);
-        if (DatabaseConnectorOld.getInstance().checkUserExistence("email", email))
-            throw new HandleError(Errors.MAIL_EXISTS);
+        //if (DatabaseConnectorOld.getInstance().checkUserExistence("email", email))
+            //throw new HandleError(Errors.MAIL_EXISTS);
     }
     public static void checkInfo(String info)
     {

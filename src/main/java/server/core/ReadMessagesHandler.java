@@ -1,9 +1,7 @@
 package server.core;
 
-import common.Errors;
 import common.objects.Body;
 import common.objects.ReadMessages;
-import server.database.DatabaseConnectorOld;
 import server.database.DatabaseManager;
 
 import java.sql.SQLException;

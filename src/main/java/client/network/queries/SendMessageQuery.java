@@ -1,7 +1,7 @@
 package client.network.queries;
 
-import client.utils.ApplicationBank;
 import client.network.ClientSocket;
+import client.suppliers.DialogManager;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
@@ -23,7 +23,7 @@ public class SendMessageQuery {
         if (response.getStatus() == Response.OK) {
             Message m =
                     JSON.parseObject(response.getBody().toJSONString(), Message.class);
-            ApplicationBank.getInstance().addMessage(m);
+            DialogManager.getInstance().addMessage(m);
         }
 
     }

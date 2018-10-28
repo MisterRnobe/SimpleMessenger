@@ -14,7 +14,7 @@ public interface DatabaseExtractor {
     int createDialog(String creator, String partner) throws SQLException;
     List<User> getUsersInDialog(Integer dialogId) throws SQLException;
     List<User> findUsers(String mask) throws SQLException;
-    DialogList getDialogs(String login, Integer count) throws SQLException;
+    List<DialogMarker> getDialogs(String login, Integer count) throws SQLException;
     UserProfile getUserProfile(String login) throws SQLException;
     User getUserStatus(String login) throws SQLException;
     List<Message> getMessagesByIds(List<Integer> ids) throws SQLException;
@@ -24,7 +24,7 @@ public interface DatabaseExtractor {
     Dialog getDialogById(Integer dialogId) throws SQLException;
     void setOnline(String login) throws SQLException;
     void setOffline(String login) throws SQLException;
-    FullDialog getFullDialog(Integer dialogId) throws SQLException;
+    FullDialog getFullDialog(Integer dialogId, String login) throws SQLException;
     int addMessage(Integer dialogId, String sender, String text, Long time) throws SQLException;
     void setLastMessage(Integer dialogId, Integer messageId) throws SQLException;
 }

@@ -1,22 +1,22 @@
 package client.app.main.dialog;
 
-import client.utils.ApplicationBank;
-import client.utils.DialogBean;
+import client.suppliers.AbstractDialogBean;
+import client.suppliers.GroupBean;
+import client.suppliers.UserSupplier;
 
 import java.io.IOException;
 
-public class ChannelWrapper extends AbstractDialogWrapper {
-    public ChannelWrapper(int dialogId) throws IOException {
-        super(dialogId);
+class ChannelWrapper extends AbstractDialogWrapper<GroupBean> {
+    ChannelWrapper(AbstractDialogBean dialogBean) throws IOException {
+        super((GroupBean) dialogBean);
         init();
     }
     private void init()
     {
-        DialogBean dialogBean = ApplicationBank.getInstance().getDialogById(dialogId);
-        dialogController.getTitle().setText(dialogBean.titleProperty().getValue());
-        dialogController.getInfo().setText("Читают: "+ dialogBean.getPartners().size()+" человек(а)");
+        dialogController.getTitle().setText(dialogBean.title().getValue());
+        dialogController.getInfo().setText("Читают: "+ (dialogBean.membersCount().get() - 1)+" человек(а)");
         bindMessages(dialogBean);
-        if (!dialogBean.creator.equalsIgnoreCase(ApplicationBank.getInstance().getLogin()))
+        if (!dialogBean.creator.equalsIgnoreCase(UserSupplier.getInstance().getMyLogin()))
         {
             dialogController.getMessageWindow().setBottom(null);
         }

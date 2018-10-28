@@ -1,5 +1,6 @@
 package server.core;
 
+import common.Errors;
 import common.Methods;
 import common.Response;
 import common.objects.Body;
@@ -16,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// FIXME: 14.10.2018 Implement GroupModification
+@Deprecated
 public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupRequest> {
     private List<String> users;
     private GroupModification response;
@@ -26,7 +29,8 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
     @Override
     protected Body onHandle(AddUsersToGroupRequest body) throws HandleError, SQLException {
         //DatabaseConnectorOld connector = DatabaseConnectorOld.getInstance();
-        DatabaseExtractor extractor = DatabaseManager.getExtractor();
+        throw new HandleError(Errors.INTERNAL_ERROR);
+        /*DatabaseExtractor extractor = DatabaseManager.getExtractor();
         users = extractor.getUsersInDialog(body.getDialogId()).stream()
                 .map(User::getLogin).collect(Collectors.toList());
         extractor.addUsersToDialog(body.getDialogId(), body.getUsers());
@@ -51,17 +55,17 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
         response.setFrom(login);
         response.setDialogId(body.getDialogId());
         response.setMessages(extractor.getMessagesByIds(messageIds));
-        return response;
+        return response;*/
     }
 
     @Override
     protected void beforeSend(Response r) {
-        DatabaseExtractor extractor = DatabaseManager.getExtractor();
+        /*DatabaseExtractor extractor = DatabaseManager.getExtractor();
         users.remove(login);
         OnlineManager.getInstance().sendAll(r, users);
-        //DatabaseConnectorOld.getInstance().getFullDialog(response.getDialogId()).getDialogInfo();
+        //DatabaseConnectorOld.getInstance().getFullDialog(response.getDialogId()).getInfo();
         try {
-            DialogInfo d = extractor.getFullDialog(response.getDialogId()).getDialogInfo();
+            DialogInfo d = extractor.getFullDialog(response.getDialogId()).getInfo();
             Response response = new Response();
             response.setType(Methods.JOIN_GROUP);
             response.setStatus(0);
@@ -72,7 +76,7 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
             OnlineManager.getInstance().sendAll(response, newUsers);
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 }
