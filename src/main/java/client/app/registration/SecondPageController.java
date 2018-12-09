@@ -1,5 +1,6 @@
 package client.app.registration;
 
+import client.controllers.ImagePreview;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

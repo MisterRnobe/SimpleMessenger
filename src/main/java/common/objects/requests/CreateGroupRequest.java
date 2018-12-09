@@ -8,6 +8,7 @@ import java.util.List;
 public class CreateGroupRequest extends Body {
     private String title;
     private List<String> partners;
+    private byte[] avatar;
 
     public String getTitle() {
         return title;
@@ -29,8 +30,12 @@ public class CreateGroupRequest extends Body {
         partners.add(partner);
     }
 
-    @Override
-    public JSONObject toJSONObject() {
-        return super.toJSONObject();
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public CreateGroupRequest setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+        return this;
     }
 }

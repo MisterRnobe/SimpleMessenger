@@ -47,27 +47,33 @@ public class MainWindowManager {
         instance = new MainWindowManager(stage);
     }
 
-    public void replaceWindow(Supplier<AbstractWindow> windowSupplier)
+    public <E extends AbstractWindow> E replaceWindow(Supplier<E> windowSupplier)
     {
+        E window = null;
         try {
-            mainWindow.replaceWindow(windowSupplier.get());
+            window = windowSupplier.get();
+            mainWindow.replaceWindow(window);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+        return window;
     }
     public void closeWindow()
     {
         mainWindow.closeTopWindow();
     }
-    public void displayWindow(Supplier<AbstractWindow> windowSupplier)
+    public <E extends AbstractWindow> E displayWindow(Supplier<E> windowSupplier)
     {
+        E window = null;
         try {
-            mainWindow.displayWindow(windowSupplier.get());
+            window = windowSupplier.get();
+            mainWindow.displayWindow(window);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return window;
     }
     public void createEmptyDialog(User u)
     {

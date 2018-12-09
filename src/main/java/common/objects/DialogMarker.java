@@ -1,4 +1,4 @@
 package common.objects;
 
-public interface DialogMarker {
+public abstract class DialogMarker extends Body {
 }

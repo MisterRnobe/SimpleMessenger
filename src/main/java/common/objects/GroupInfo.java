@@ -1,6 +1,6 @@
 package common.objects;
 
-public class GroupInfo extends Body implements DialogMarker{
+public class GroupInfo extends DialogMarker{
 
     private int dialogId;
     private int type;

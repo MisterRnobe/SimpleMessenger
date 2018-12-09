@@ -147,7 +147,7 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
         handlers.put(Methods.CREATE_DIALOG, r-> this.onCreateDialog(r, new CreateDialogHandler(login)));
         handlers.put(Methods.CREATE_CHANNEL, r -> this.onCreateDialog(r, new CreateChannelHandler(login)));
-        handlers.put(Methods.CREATE_GROUP, r-> this.onCreateDialog(r, new CreateGroupHandler(login)));
+        handlers.put(Methods.CREATE_GROUP, r-> new CreateGroupHandler(login).handle(r));//this.onCreateDialog(r, new CreateGroupHandler(login)));
         handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
         handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
         handlers.put(Methods.HOOK_USER_STATUS, r-> new HookUserStatusHandler(this).handle(r));

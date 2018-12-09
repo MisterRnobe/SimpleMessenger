@@ -41,6 +41,11 @@ public class ApplicationManager extends Application{
                 e.printStackTrace();
             }});
     }
+
+    public Stage getMainStage() {
+        return mainStage;
+    }
+
     public static ApplicationManager getInstance(){
         return instance;
     }

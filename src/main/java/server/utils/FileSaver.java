@@ -19,6 +19,14 @@ public class FileSaver {
             e.printStackTrace();
         }
     }
+    public static void saveGroupAvatar(byte[] avatar, Integer dialogId)
+    {
+        try(FileOutputStream outputStream = new FileOutputStream(new File(HOME_FOLDER+AVATAR_FOLDER+GROUP_AVATAR_FOLDER+dialogId + AVATAR_FORMAT))) {
+            outputStream.write(avatar);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static String getPathForUserAvatar(String login)
     {
         return AVATAR_FOLDER + USER_AVATAR_FOLDER + login + AVATAR_FORMAT;

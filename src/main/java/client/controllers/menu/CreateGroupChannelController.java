@@ -2,6 +2,7 @@ package client.controllers.menu;
 
 import client.app.main.AbstractWindow;
 import client.app.main.MainWindowManager;
+import client.controllers.ImagePicker;
 import client.controllers.UserListController;
 import client.suppliers.UserSupplier;
 import javafx.fxml.FXML;
@@ -24,17 +25,29 @@ public class CreateGroupChannelController extends AbstractWindow
 
     private UserListController listController;
 
-    private BiConsumer<String, List<String>> onClick = (s, list) -> {};
+    private TriConsumer<String, List<String>, byte[]> onClick = (s, list, b) -> {};
+    private byte[] avatar = null;
 
     @FXML
     private void onClick()
     {
         try {
-            onClick.consume(title.getText(), listController.getSelected());
+            onClick.consume(title.getText(), listController.getSelected(), avatar);
             MainWindowManager.getInstance().closeWindow();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    @FXML
+    private void selectAvatar()
+    {
+        ImagePicker picker = MainWindowManager.getInstance().replaceWindow(ImagePicker::create);
+        if (picker == null)
+            return;
+        picker.setOnImageSelect(bytes -> {
+            avatar = bytes;
+            System.out.println("Получил пикчу, заебОк");
+        });
     }
     public static CreateGroupChannelController create() throws IOException
     {
@@ -51,14 +64,14 @@ public class CreateGroupChannelController extends AbstractWindow
         empty.getChildren().add(listController.getRoot());
     }
 
-    public void setOnClick(BiConsumer<String, List<String>> onClick)
+    public void setOnClick(TriConsumer<String, List<String>, byte[]> onClick)
     {
         this.onClick = onClick;
     }
 
     @FunctionalInterface
-    public interface BiConsumer<E, T>
+    public interface TriConsumer<E, T, V>
     {
-        void consume(E e, T t) throws Exception;
+        void consume(E e, T t, V v) throws Exception;
     }
 }

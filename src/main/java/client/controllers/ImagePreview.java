@@ -1,4 +1,4 @@
-package client.app.registration;
+package client.controllers;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -92,11 +92,11 @@ public class ImagePreview {
         preview.setFitHeight(currHeight);
     }
 
-    Image getImage()
+    public Image getImage()
     {
         return preview.getImage();
     }
-    double[] getBounds()
+    public double[] getBounds()
     {
         return new double[]{coef*(anchors[0].getCenterX() - xLeft), coef*(anchors[0].getCenterY() - yTop),
                 coef*(anchors[1].getCenterY() - anchors[0].getCenterY())};

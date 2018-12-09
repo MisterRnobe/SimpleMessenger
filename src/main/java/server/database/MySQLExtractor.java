@@ -49,11 +49,12 @@ public class MySQLExtractor implements DatabaseExtractor {
     }
 
     @Override
-    public int createGroup(String creator, String title, List<String> partners) throws SQLException {
+    public int createGroup(String creator, String title, List<String> partners, boolean hasPhoto) throws SQLException {
         int dialogId = connector.insert("dialogs", CustomMap.create()
                         .add("dialog_name", title)
                         .add("creator", creator)
-                        .add("type", Integer.toString(DialogTypes.GROUP)));
+                        .add("type", Integer.toString(DialogTypes.GROUP))
+                        .add("has_photo", hasPhoto? "1":"0"));
         if (dialogId == -1)
             return dialogId;
         connector.insert("user_dialog", CustomMap.create()
@@ -287,7 +288,7 @@ public class MySQLExtractor implements DatabaseExtractor {
         if (type == -1)
             throw new SQLException("GROUP "+dialogId+" NOT FOUND!");
         List<Integer> id = new LinkedList<>();
-        id.add(type);
+        id.add(dialogId);
         //According to its type, extracting info
         DialogMarker dialog = (type == DialogTypes.DIALOG? getAsDialog(id, login): getAsGroup(id, login)).get(0);
         FullDialog fullDialog = new FullDialog();
@@ -295,21 +296,6 @@ public class MySQLExtractor implements DatabaseExtractor {
         fullDialog.setInfo(dialog);
 
         return fullDialog;
-        /*String query = "SELECT d.dialog_id as dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type AS type, d.has_photo as has_photo, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id = ?;";
-        DialogInfo dialogInfo = connector.select(query, rs -> {
-            DialogInfo di = null;
-            if (rs.next()) {
-                di = buildDialogInfo(rs);
-                Message m = buildMessage(rs);
-                di.setLastMessage(m);
-            }
-            return di;
-        }, Integer.toString(dialogId));
-        dialogInfo.setUsers(getUsersInDialog(dialogId));
-        FullDialog fullDialog = new FullDialog();
-        fullDialog.setInfo(dialogInfo);
-        fullDialog.setDialog(getDialogById(dialogId));
-        return fullDialog;*/
     }
 
     @Override
@@ -350,6 +336,8 @@ public class MySQLExtractor implements DatabaseExtractor {
     }
     private List<DialogMarker> getAsDialog(List<Integer> dialogIds, String login) throws SQLException
     {
+        if (dialogIds.isEmpty())
+            return new LinkedList<>();
         //Extracting info
         String wrappedIds = dialogIds.stream().map(Object::toString).collect(Collectors.joining(",", "(", ")"));
         String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.last_message_id as message_id, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from dialogs AS d LEFT JOIN messages as m ON d.last_message_id = m.message_id where d.dialog_id in "+wrappedIds+";";
@@ -391,6 +379,8 @@ public class MySQLExtractor implements DatabaseExtractor {
     }
     private List<DialogMarker> getAsGroup(List<Integer> dialogIds, String login) throws SQLException
     {
+        if (dialogIds.isEmpty())
+            return new LinkedList<>();
         //Extracting info
         String wrappedIds = dialogIds.stream().map(Object::toString).collect(Collectors.joining(",", "(", ")"));
         String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.type AS type, d.has_photo AS has_photo, count(*) AS user_count, m.message_id AS message_id, m.sender AS sender, m.text AS text, m.time AS time, m.is_system AS is_system FROM dialogs AS d LEFT JOIN messages AS m ON d.last_message_id=m.message_id LEFT JOIN user_dialog AS u_d ON u_d.dialog_id = d.dialog_id WHERE d.dialog_id IN "+wrappedIds+" GROUP BY dialog_id;";
@@ -414,9 +404,7 @@ public class MySQLExtractor implements DatabaseExtractor {
             return map;
         }, login);
         //Joining
-        groupInfos.forEach(gi-> {
-            gi.setUsersCount(unread.getOrDefault(gi.getDialogId(), 0));
-        });
+        groupInfos.forEach(gi-> gi.setUsersCount(unread.getOrDefault(gi.getDialogId(), 0)));
         return new LinkedList<>(groupInfos);
     }
     private static String hash256(String data) {

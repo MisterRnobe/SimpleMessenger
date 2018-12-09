@@ -14,7 +14,7 @@
    <children>
       <AnchorPane prefHeight="100.0" prefWidth="300.0" style="-fx-background-color: #eee;">
          <children>
-            <Circle fill="#ffffff" radius="40.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" fx:id="avatarSelector"/>
+            <Circle fill="#ffffff" radius="40.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" fx:id="avatarSelector" onMouseClicked="#selectAvatar"/>
             <VBox AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="27.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Название :">

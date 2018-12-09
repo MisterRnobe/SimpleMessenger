@@ -7,7 +7,7 @@ public class DatabaseManager {
     private static DatabaseExtractor extractorInterface;
     private static void init()
     {
-        String url = "jdbc:mariadb://192.168.1.61:3306/simple_messenger";
+        String url = "jdbc:mariadb://nikitamedvedev.ddns.net:3306/simple_messenger";
         String login = "nikita";
         String pass = "pass";
         try {
