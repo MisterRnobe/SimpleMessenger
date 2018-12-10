@@ -94,7 +94,7 @@ public class MainWindowManager {
         AbstractDialogBean bean = DialogManager.getInstance().getDialogById(dialogId);
         if (bean.messages().size() == 0) {
             try {
-                GetDialogQuery.sendQuery(dialogId);
+                GetDialogQuery.sendQuery(dialogId, d-> setDialog(d.getDialogId()));
             } catch (IOException e) {
                 e.printStackTrace();
             }

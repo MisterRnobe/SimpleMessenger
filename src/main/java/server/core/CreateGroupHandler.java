@@ -1,11 +1,8 @@
 package server.core;
 
-import com.alibaba.fastjson.JSONObject;
+import common.Methods;
 import common.Response;
-import common.objects.Body;
-import common.objects.DialogMarker;
-import common.objects.FullDialog;
-import common.objects.User;
+import common.objects.*;
 import common.objects.requests.CreateGroupRequest;
 import server.OnlineManager;
 import server.database.DatabaseExtractor;
@@ -18,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
     private List<User> usersFromLastGroup;
-    private DialogMarker lastDialog;
+    private Message messageToLastCreatedGroup;
 
     public CreateGroupHandler(String login) {
         super(CreateGroupRequest.class, new String[]{"title", "partners"}, login);
@@ -34,19 +31,14 @@ public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
         extractor.setLastMessage(dialogId, messageId);
         FullDialog fullDialog = extractor.getFullDialog(dialogId, login);
         usersFromLastGroup = extractor.getUsersInDialog(dialogId);
-        lastDialog = fullDialog.getInfo();
+        List<Message> messages = fullDialog.getDialog().getMessages();
+        messageToLastCreatedGroup = messages.get(messages.size() - 1);
 
         return fullDialog;
     }
 
     @Override
-    protected void beforeSend(Response response) {
-        Response newGroupMessage = new Response();
-        newGroupMessage.setStatus(Response.OK);
-        newGroupMessage.setType(response.getType());
-        newGroupMessage.setBody(lastDialog.toJSONObject());
-        OnlineManager.getInstance().sendAll(newGroupMessage,
-                usersFromLastGroup.stream().map(User::getLogin).filter(str->!str.equalsIgnoreCase(login))
-                .collect(Collectors.toList()));
+    protected void beforeSend() {
+        AbstractHandler.sendAllMessage(messageToLastCreatedGroup, usersFromLastGroup);
     }
 }

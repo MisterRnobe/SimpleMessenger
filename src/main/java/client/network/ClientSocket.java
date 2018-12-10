@@ -36,6 +36,7 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.VERIFY_DATA, VerifyDataQuery::onHandle);
         handlers.put(Methods.GET_FILE, GetFileQuery::onHandle);
         handlers.put(Methods.GET_USER, GetUserQuery::onHandle);
+        handlers.put(Methods.NEW_MESSAGE, NewMessageConsumer::onHandle);
     }
 
     public static ClientSocket getInstance() {
