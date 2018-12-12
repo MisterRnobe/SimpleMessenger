@@ -1,8 +1,7 @@
 package client.network.queries;
 
-import client.suppliers.DialogManager;
 import client.network.ClientSocket;
-import client.app.main.MainWindowManager;
+import client.suppliers.DialogManager;
 import client.utils.CallbackMap;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
