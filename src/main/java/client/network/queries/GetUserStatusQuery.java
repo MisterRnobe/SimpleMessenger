@@ -26,7 +26,7 @@ public class GetUserStatusQuery {
         if (response.getStatus() == Response.OK) {
             User user =
                     JSON.parseObject(response.getBody().toJSONString(), User.class);
-            //ApplicationBank.getInstance().updateUserStatus(user);
+            //ApplicationBank.getInstance().updateUserStatus(User);
             UserStatusListener.getInstance().acceptUser(user);
         }
     }

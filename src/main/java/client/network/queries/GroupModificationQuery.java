@@ -28,7 +28,7 @@ public class GroupModificationQuery {
             {
                 DialogBean b = ApplicationBank.getInstance().getDialogById(modification.getDialogId());
                 b.users().addAll(modification.getUsers().stream().map(User::getLogin).collect(Collectors.toList()));
-                modification.getUsers().forEach(user -> ApplicationBank.getInstance().addUser(user));
+                modification.getUsers().forEach(User -> ApplicationBank.getInstance().addUser(User));
                 modification.getMessages().forEach(m->ApplicationBank.getInstance().addMessage(m));
             }*/
         }
