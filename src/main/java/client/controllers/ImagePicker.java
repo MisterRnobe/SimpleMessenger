@@ -18,6 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,9 +31,13 @@ public class ImagePicker extends AbstractWindow {
 
     private ImagePreview imagePreview;
 
-    private Consumer<byte[]> onOk = b->{};
+    private Consumer<WritableImage> onOk = b->{};
     @FXML
     private Button okButton;
+    @FXML
+    private void onClickCancel(){
+        close();
+    }
     @FXML
     private void initialize()
     {
@@ -53,7 +58,7 @@ public class ImagePicker extends AbstractWindow {
     private void onClickOk(ActionEvent event)
     {
 
-        byte[] image = null;
+        WritableImage image = null;
         try {
             image = getCroppedImage();
         } catch (IOException e) {
@@ -79,11 +84,12 @@ public class ImagePicker extends AbstractWindow {
             imagePreview.setPreview(image);
         }
     }
-    public void setOnImageSelect(Consumer<byte[]> callback)
+    //WritableImage
+    public void setOnImageSelect(Consumer<WritableImage> callback)
     {
         this.onOk = callback;
     }
-    private byte[] getCroppedImage() throws IOException
+    private WritableImage getCroppedImage() throws IOException
     {
         double[] d = imagePreview.getBounds();
         Image image = imagePreview.getImage();
@@ -91,11 +97,8 @@ public class ImagePicker extends AbstractWindow {
         PixelReader reader = image.getPixelReader();
         WritableImage wi = new WritableImage(reader, (int)d[0], (int)d[1], (int)d[2], (int) d[2]);
 
-        BufferedImage bi = SwingFXUtils.fromFXImage(wi, null);
+        return wi;
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ImageIO.write(bi, "png", stream);
-        return stream.toByteArray();
     }
 
 

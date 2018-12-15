@@ -42,7 +42,7 @@
       </AnchorPane>
       <AnchorPane layoutX="10.0" layoutY="80.0">
          <children>
-            <Label text="Phone number" AnchorPane.leftAnchor="0.0">
+            <Label text="Email" AnchorPane.leftAnchor="0.0">
                <font>
                   <Font size="16.0"/>
                </font>

@@ -16,7 +16,7 @@ public class ImagePreview {
     private int minH;
 
 
-    private double maxHeight = 300, maxWidth = 300;
+    private double maxHeight = 250, maxWidth = 250;
     private double currHeight = maxHeight, currWidth = maxWidth;
 
 
