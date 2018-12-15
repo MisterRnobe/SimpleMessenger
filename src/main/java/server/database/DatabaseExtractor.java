@@ -10,7 +10,7 @@ public interface DatabaseExtractor {
     boolean verifyUser(UserPasswordData userPasswordData) throws SQLException;
     void addUser(RegistrationData registrationData) throws SQLException;
     int createGroup(String creator, String title, List<String> partners, boolean hasAvatar) throws SQLException;
-    int createChannel(String creator, String title, List<String> partners) throws SQLException;
+    int createChannel(String creator, String title, List<String> partners, boolean hasAvatar) throws SQLException;
     int createDialog(String creator, String partner) throws SQLException;
     List<User> getUsersInDialog(Integer dialogId) throws SQLException;
     List<User> findUsers(String mask) throws SQLException;

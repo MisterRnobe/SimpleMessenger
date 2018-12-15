@@ -9,7 +9,7 @@ public class Response {
 
 
     private int status;
-    private int code; //In case error status
+    private Integer code; //In case error status
     private JSONObject body;
     private String type;
     public Response()
@@ -25,11 +25,11 @@ public class Response {
         this.status = status;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 

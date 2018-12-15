@@ -57,26 +57,4 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
         response.setMessages(extractor.getMessagesByIds(messageIds));
         return response;*/
     }
-
-    @Override
-    protected void beforeSend(Response r) {
-        /*DatabaseExtractor extractor = DatabaseManager.getExtractor();
-        users.remove(login);
-        OnlineManager.getInstance().sendAll(r, users);
-        //DatabaseConnectorOld.getInstance().getFullDialog(response.getDialogId()).getInfo();
-        try {
-            DialogInfo d = extractor.getFullDialog(response.getDialogId()).getInfo();
-            Response response = new Response();
-            response.setType(Methods.JOIN_GROUP);
-            response.setStatus(0);
-            response.setBody(d.toJSONObject());
-            List<String> newUsers = d.getUsers().stream().map(User::getLogin).collect(Collectors.toList());
-            newUsers.remove(login);
-            newUsers.removeAll(users);
-            OnlineManager.getInstance().sendAll(response, newUsers);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }*/
-
-    }
 }

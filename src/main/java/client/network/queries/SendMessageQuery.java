@@ -18,8 +18,8 @@ public class SendMessageQuery {
         Request r = new Request().setMethod(Methods.SEND_MESSAGE).setBody(m.toJSONObject());
         ClientSocket.getInstance().send(r);
     }
-    public static void onHandle(Response response)
-    {
+
+    public static void onHandle(Response response) {
         if (response.getStatus() == Response.OK) {
             Message m =
                     JSON.parseObject(response.getBody().toJSONString(), Message.class);
