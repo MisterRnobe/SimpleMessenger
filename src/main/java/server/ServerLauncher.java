@@ -9,7 +9,7 @@ import server.servlet.EventServlet;
 @Slf4j
 public class ServerLauncher {
     public static void main(String[] args) {
-        int port = 200;
+        int port = 8081;
         if (args.length > 0)
             try {
                 port = Integer.parseInt(args[0]);
