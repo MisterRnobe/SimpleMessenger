@@ -40,13 +40,13 @@ public class OnlineManager {
     }
     public void setOffline(String login)
     {
-        List<Consumer<Boolean>> l = eventListeners.get(login);
-        if (l != null)
-            l.forEach(c->c.accept(false));
-        online.remove(login);
         //DatabaseConnectorOld.getInstance().setOffline(login);
         try {
             extractor.setOffline(login);
+            List<Consumer<Boolean>> l = eventListeners.get(login);
+            if (l != null)
+                l.forEach(c->c.accept(false));
+            online.remove(login);
         } catch (SQLException e) {
             e.printStackTrace();
         }

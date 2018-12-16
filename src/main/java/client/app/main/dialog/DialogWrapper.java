@@ -32,7 +32,7 @@ public class DialogWrapper extends AbstractDialogWrapper<DialogBean> {
 
         try {
             GetUserStatusQuery.hookToUser(partner, user -> Platform.runLater(()-> {
-                if (user.isOnline()) {
+                if (user.getIsOnline()) {
                     dialogController.getInfo().setText("В сети");
                 } else {
                     Date d = new Date(user.getLastOnline());

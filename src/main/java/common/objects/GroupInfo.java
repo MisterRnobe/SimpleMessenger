@@ -1,5 +1,7 @@
 package common.objects;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class GroupInfo extends DialogMarker{
 
     private String groupName;
@@ -44,5 +46,14 @@ public class GroupInfo extends DialogMarker{
     public GroupInfo setUsersCount(int usersCount) {
         this.usersCount = usersCount;
         return this;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        return super.toJSONObject()
+                .fluentPut("groupName", groupName)
+                .fluentPut("creator", creator)
+                .fluentPut("avatarPath", avatarPath)
+                .fluentPut("usersCount", usersCount);
     }
 }

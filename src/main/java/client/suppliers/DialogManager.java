@@ -57,14 +57,14 @@ public class DialogManager {
     public void addMessages(int dialogId, List<Message> messages) {
         AbstractDialogBean abstractDialogBean = allDialogs.get(dialogId);
         if (abstractDialogBean != null) {
-            abstractDialogBean.messages().addAll(messages);
+            abstractDialogBean.setMessages(messages);
         }
     }
 
     public void addMessage(Message m) {
         AbstractDialogBean abstractDialogBean = allDialogs.get(m.getDialogId());
         if (abstractDialogBean != null) {
-            abstractDialogBean.messages().add(m);
+            abstractDialogBean.setLastMessage(m);
         }
     }
 

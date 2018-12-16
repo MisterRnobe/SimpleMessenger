@@ -23,11 +23,11 @@ public class User extends Body {
         this.name = name;
     }
 
-    public boolean isOnline() {
+    public boolean getIsOnline() {
         return isOnline;
     }
 
-    public void setOnline(boolean online) {
+    public void setIsOnline(boolean online) {
         isOnline = online;
     }
 

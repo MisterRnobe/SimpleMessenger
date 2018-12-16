@@ -27,7 +27,7 @@ public class NewDialogWrapper extends AbstractDialogWrapper {
     {
         dialogController.getTitle().setText(user.getName());
         String text;
-        if (user.isOnline())
+        if (user.getIsOnline())
             text = "В сети";
         else
         {

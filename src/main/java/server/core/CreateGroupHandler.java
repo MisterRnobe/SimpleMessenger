@@ -8,6 +8,7 @@ import server.utils.FileSaver;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
     private List<User> usersFromLastGroup;
@@ -26,7 +27,9 @@ public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
         int messageId = extractor.addMessage(dialogId, null, "Created!", System.currentTimeMillis());
         extractor.setLastMessage(dialogId, messageId);
         FullDialog fullDialog = extractor.getFullDialog(dialogId, login);
-        usersFromLastGroup = extractor.getUsersInDialog(dialogId);
+        usersFromLastGroup = extractor.getUsersInDialog(dialogId).stream()
+                .filter(u -> !u.getLogin().equals(login))
+                .collect(Collectors.toList());
         this.dialogId = fullDialog.getInfo().getDialogId();
 
         return fullDialog;

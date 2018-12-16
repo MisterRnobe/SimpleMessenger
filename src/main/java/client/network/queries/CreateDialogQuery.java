@@ -1,7 +1,9 @@
 package client.network.queries;
 
+import client.app.main.MainWindowManager;
 import client.network.ClientSocket;
 import client.suppliers.DialogManager;
+import client.utils.CallbackMap;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import common.Methods;
@@ -51,6 +53,7 @@ public class CreateDialogQuery {
             DialogManager.getInstance().addDialog(unparsedDialog);
             Dialog dialog = response.getBody().getObject("dialog", Dialog.class);
             DialogManager.getInstance().addMessages(dialog.getDialogId(), dialog.getMessages());
+            MainWindowManager.getInstance().setDialog(dialog.getDialogId());
         }
     }
 }

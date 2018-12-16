@@ -7,6 +7,7 @@ import server.database.DatabaseManager;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreateChannelHandler extends AbstractHandler<CreateGroupRequest> {
     private int dialogId;
@@ -24,7 +25,9 @@ public class CreateChannelHandler extends AbstractHandler<CreateGroupRequest> {
         extractor.setLastMessage(dialogId, messageId);
         FullDialog fullDialog = extractor.getFullDialog(dialogId, login);
         this.dialogId = fullDialog.getInfo().getDialogId();
-        usersInChannel = extractor.getUsersInDialog(dialogId);
+        usersInChannel = extractor.getUsersInDialog(dialogId).stream()
+                .filter(u -> !u.getLogin().equals(login))
+                .collect(Collectors.toList());
         return fullDialog;
     }
 

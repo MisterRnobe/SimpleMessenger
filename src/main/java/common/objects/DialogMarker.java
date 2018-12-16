@@ -1,5 +1,7 @@
 package common.objects;
 
+import com.alibaba.fastjson.JSONObject;
+
 public abstract class DialogMarker extends Body {
     private int dialogId;
     private int type;
@@ -40,5 +42,14 @@ public abstract class DialogMarker extends Body {
     public DialogMarker setUnread(int unread) {
         this.unread = unread;
         return this;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        return new JSONObject()
+                .fluentPut("dialogId", getDialogId())
+                .fluentPut("type", getType())
+                .fluentPut("lastMessage", getLastMessage())
+                .fluentPut("unread", getUnread());
     }
 }

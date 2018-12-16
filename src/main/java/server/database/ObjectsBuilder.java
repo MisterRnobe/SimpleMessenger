@@ -20,7 +20,7 @@ public class ObjectsBuilder {
         userBuilder.put("login", (rs, i, user)-> user.setLogin(rs.getString(i)));
         userBuilder.put("name", (rs, i, user)-> user.setName(rs.getString(i)));
         userBuilder.put("last_online", (rs, i, user)-> user.setLastOnline(rs.getLong(i)));
-        userBuilder.put("online", (rs, i, user)-> user.setOnline(rs.getBoolean(i)));
+        userBuilder.put("online", (rs, i, user)-> user.setIsOnline(rs.getBoolean(i)));
         userBuilder.put("has_avatar",(rs,i,user)->
         {
             if (rs.getBoolean(i))

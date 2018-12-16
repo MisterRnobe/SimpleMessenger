@@ -17,7 +17,7 @@ public abstract class AbstractDialogBean {
     public final int dialogId;
 
     protected AbstractDialogBean(int type, int dialogId) {
-        lastMessage = new ReadOnlyObjectWrapper<>(this,"lastMessage");
+        lastMessage = new ReadOnlyObjectWrapper<>(this, "lastMessage");
         messages = FXCollections.observableArrayList();
         unreadCount = new ReadOnlyIntegerWrapper(this, "unreadCount");
         avatarPath = new ReadOnlyStringWrapper(this, "avatarPath");
@@ -25,44 +25,44 @@ public abstract class AbstractDialogBean {
         this.type = type;
         this.dialogId = dialogId;
     }
-    void setMessages(List<Message> messages)
-    {
+
+    void setMessages(List<Message> messages) {
         this.messages.addAll(messages);
+        this.lastMessage.set(messages.get(messages.size() - 1));
     }
-    void setLastMessage(Message message)
-    {
+
+    void setLastMessage(Message message) {
         this.lastMessage.set(message);
-        if (messages.size() != 0)
-        {
+        if (messages.size() != 0) {
             messages.add(message);
         }
     }
-    public void addUnreadCount(int count)
-    {
+
+    public void addUnreadCount(int count) {
         unreadCount.set(unreadCount.getValue() + count);
     }
-    public void readMessages()
-    {
+
+    public void readMessages() {
         this.unreadCount.set(0);
     }
-    public ReadOnlyObjectProperty<Message> lastMessageProperty()
-    {
+
+    public ReadOnlyObjectProperty<Message> lastMessageProperty() {
         return lastMessage.getReadOnlyProperty();
     }
-    public ObservableList<Message> messages()
-    {
+
+    public ObservableList<Message> messages() {
         return messages;
     }
-    public ReadOnlyIntegerProperty unreadCountProperty()
-    {
+
+    public ReadOnlyIntegerProperty unreadCountProperty() {
         return unreadCount.getReadOnlyProperty();
     }
-    public ReadOnlyStringProperty avatarPath()
-    {
+
+    public ReadOnlyStringProperty avatarPath() {
         return avatarPath.getReadOnlyProperty();
     }
-    public ReadOnlyStringProperty title()
-    {
+
+    public ReadOnlyStringProperty title() {
         return title.getReadOnlyProperty();
     }
 }

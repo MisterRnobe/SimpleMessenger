@@ -35,60 +35,56 @@ public class DialogChooserController {
 
     private String stdColor;
     private AbstractDialogBean bindDialog;
-    private BiConsumer<DialogChooserController, Message> onNewMessage = (d,m)->{};
+    private BiConsumer<DialogChooserController, Message> onNewMessage = (d, m) -> {
+    };
 
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         stdColor = "ffffff";
-        pane.setBackground(new Background(new BackgroundFill(Color.web("#"+stdColor),
+        pane.setBackground(new Background(new BackgroundFill(Color.web("#" + stdColor),
                 CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     @FXML
-    private void onMouseEnter()
-    {
+    private void onMouseEnter() {
         String color = "8EF98A";
-        pane.setBackground(new Background(new BackgroundFill(Color.web("#"+color),
+        pane.setBackground(new Background(new BackgroundFill(Color.web("#" + color),
                 CornerRadii.EMPTY, Insets.EMPTY)));
     }
+
     @FXML
-    private void onMouseExit()
-    {
-        pane.setBackground(new Background(new BackgroundFill(Color.web("#"+stdColor),
+    private void onMouseExit() {
+        pane.setBackground(new Background(new BackgroundFill(Color.web("#" + stdColor),
                 CornerRadii.EMPTY, Insets.EMPTY)));
     }
+
     @FXML
-    private void onMouseClicked()
-    {
+    private void onMouseClicked() {
         MainWindowManager.getInstance().setDialog(bindDialog.dialogId);
     }
-    public Parent getPane()
-    {
+
+    public Parent getPane() {
         return pane;
     }
-    public static DialogChooserController create(AbstractDialogBean dialogInfo) throws IOException
-    {
+
+    public static DialogChooserController create(AbstractDialogBean dialogInfo) throws IOException {
         FXMLLoader loader = new FXMLLoader(DialogChooserController.class.getResource("DialogChooser.fxml"));
         loader.load();
         DialogChooserController controller = loader.getController();
         controller.bindDialog(dialogInfo);
         return controller;
     }
-    private void bindDialog(AbstractDialogBean dialogBean)
-    {
+
+    private void bindDialog(AbstractDialogBean dialogBean) {
         title.textProperty().bind(dialogBean.title());
         dialogBean.lastMessageProperty().addListener((observable, oldValue, newValue) ->
-                Platform.runLater(()->{
+                Platform.runLater(() -> {
                     lastMessage.setText(newValue.getText());
                     onNewMessage.accept(this, newValue);
-                    if (newValue.getDialogId() != MainWindowManager.getInstance().getOpenedDialogId())
-                    {
+                    if (newValue.getDialogId() != MainWindowManager.getInstance().getOpenedDialogId()) {
                         bindDialog.addUnreadCount(1);
-                    }
-                    else
-                    {
+                    } else {
                         try {
                             ReadMessageQuery.sendQuery(newValue.getDialogId());
                         } catch (IOException e) {
@@ -98,7 +94,7 @@ public class DialogChooserController {
                 }));
         lastMessage.setText(dialogBean.lastMessageProperty().getValue().getText());
         dialogBean.unreadCountProperty().addListener((observable, oldValue, newValue) ->
-                Platform.runLater(()->setUnreadCount(newValue.intValue())));
+                Platform.runLater(() -> setUnreadCount(newValue.intValue())));
         setUnreadCount(dialogBean.unreadCountProperty().get());
         bindDialog = dialogBean;
 
@@ -107,28 +103,26 @@ public class DialogChooserController {
         else
             setAvatar(AvatarSupplier.paintDefaultAvatar(dialogBean.title().getValue()));
     }
-    public void setOnMessageReceived(BiConsumer<DialogChooserController, Message> consumer)
-    {
+
+    public void setOnMessageReceived(BiConsumer<DialogChooserController, Message> consumer) {
         this.onNewMessage = consumer;
     }
-    private void setUnreadCount(int count)
-    {
-        if (count == 0)
-        {
+
+    private void setUnreadCount(int count) {
+        if (count == 0) {
             unreadCount.setText("");
             lastMessage.setStyle("-fx-background-color: transparent");
-        }
-        else
-        {
+        } else {
             unreadCount.setText(Integer.toString(count));
             lastMessage.setStyle("-fx-background-color: lightblue");
         }
     }
+
     public int getDialogId() {
         return bindDialog.dialogId;
     }
-    private void setAvatar(Image image)
-    {
+
+    private void setAvatar(Image image) {
         this.avatar.setFill(new ImagePattern(image));
     }
 }
