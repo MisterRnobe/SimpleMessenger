@@ -164,7 +164,7 @@ public class MainWindowController {
 
             if (window == null) {
                 locker.setOpacity(0.5d);
-                Platform.runLater(() -> root.getChildren().add(locker));
+                root.getChildren().add(locker);
             }
             root.getChildren().add(p);
 
