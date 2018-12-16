@@ -4,6 +4,7 @@ import client.app.initial.InitialWindowController;
 import client.app.main.MainWindowManager;
 import client.controllers.ErrorController;
 import client.controllers.ImagePicker;
+import client.network.ClientSocket;
 import client.network.SocketConnection;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,6 +19,7 @@ public class ApplicationManager extends Application{
     private Stage mainStage;
     public void start(Stage primaryStage) throws Exception {
         SocketConnection.connect();
+        ClientSocket.setOnError(s->MainWindowManager.getInstance().displayWindow(()->ErrorController.create(s)));
         primaryStage.setResizable(false);
         this.mainStage = primaryStage;
         Parent p = InitialWindowController.create();

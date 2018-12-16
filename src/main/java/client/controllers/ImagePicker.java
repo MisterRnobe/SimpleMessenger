@@ -93,7 +93,7 @@ public class ImagePicker extends AbstractWindow {
     {
         double[] d = imagePreview.getBounds();
         Image image = imagePreview.getImage();
-
+        //todo try catch if no image
         PixelReader reader = image.getPixelReader();
         WritableImage wi = new WritableImage(reader, (int)d[0], (int)d[1], (int)d[2], (int) d[2]);
 

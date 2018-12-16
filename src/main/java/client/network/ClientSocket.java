@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 public class ClientSocket extends WebSocketAdapter {
     private static ClientSocket instance;
-
+    private static Consumer<String> onError = s->{};
     private final Map<String, Consumer<Response>> handlers = new HashMap<>();
     {
         handlers.put(Methods.LOGIN, AuthorizationQuery::onHandle);
@@ -40,7 +40,9 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_USER, GetUserQuery::onHandle);
         handlers.put(Methods.NEW_MESSAGE, NewMessageConsumer::onHandle);
     }
-
+    public static void setOnError(Consumer<String> action){
+        onError = action;
+    }
     public static ClientSocket getInstance() {
         return instance;
     }
@@ -69,15 +71,14 @@ public class ClientSocket extends WebSocketAdapter {
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
         System.out.println("CLOSE: " + reason);
-        MainWindowManager.getInstance().displayWindow(ErrorController::create);
-
+        onError.accept(reason);
         //TODO reconnect
     }
 
     @Override
     public void onWebSocketError(Throwable cause) {
         System.out.println("ERROR: "+cause.getMessage());
-        MainWindowManager.getInstance().displayWindow(ErrorController::create);
+        onError.accept(cause.getMessage());
                 //.replaceWindow(ErrorController::create);
 
     }
