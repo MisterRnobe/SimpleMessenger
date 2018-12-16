@@ -1,21 +1,17 @@
 package server.core;
 
-import common.Methods;
-import common.Response;
 import common.objects.*;
 import common.objects.requests.CreateGroupRequest;
-import server.OnlineManager;
 import server.database.DatabaseExtractor;
 import server.database.DatabaseManager;
 import server.utils.FileSaver;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
     private List<User> usersFromLastGroup;
-    private Message messageToLastCreatedGroup;
+    private int dialogId;
 
     public CreateGroupHandler(String login) {
         super(CreateGroupRequest.class, new String[]{"title", "partners"}, login);
@@ -31,14 +27,13 @@ public class CreateGroupHandler extends AbstractHandler<CreateGroupRequest> {
         extractor.setLastMessage(dialogId, messageId);
         FullDialog fullDialog = extractor.getFullDialog(dialogId, login);
         usersFromLastGroup = extractor.getUsersInDialog(dialogId);
-        List<Message> messages = fullDialog.getDialog().getMessages();
-        messageToLastCreatedGroup = messages.get(messages.size() - 1);
+        this.dialogId = fullDialog.getInfo().getDialogId();
 
         return fullDialog;
     }
 
     @Override
     protected void beforeSend() {
-        AbstractHandler.sendAllMessage(messageToLastCreatedGroup, usersFromLastGroup);
+        AbstractHandler.sendAllNewDialog(dialogId, usersFromLastGroup);
     }
 }

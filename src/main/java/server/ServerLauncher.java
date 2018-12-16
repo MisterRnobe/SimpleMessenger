@@ -6,21 +6,20 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import server.servlet.EventServlet;
 
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.PrintStream;
 
 public class ServerLauncher {
     public static void main(String[] args) {
 
 
-        try {
-            FileOutputStream outputStream = new FileOutputStream("/SimpleManager/log.log");
-            PrintStream printStream = new PrintStream(outputStream);
-            System.setOut(printStream);
-
-        } catch (Exception ignored) {
-
-        }
+//        try {
+//            FileOutputStream outputStream = new FileOutputStream("/SimpleManager/log.log");
+//            PrintStream printStream = new PrintStream(outputStream);
+//            System.setOut(printStream);
+//
+//        } catch (Exception ignored) {
+//
+//        }
 
         int port = 8081;
         if (args.length > 0)

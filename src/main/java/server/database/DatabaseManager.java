@@ -7,7 +7,7 @@ public class DatabaseManager {
     private static DatabaseExtractor extractorInterface;
     private static void init()
     {
-        String url = "jdbc:mysql://localhost:3306/messenger";
+        String url = "jdbc:mysql://lirveez.sytes.net:3306/messenger";
         String login = "nikita";
         String pass = "nikita123456";
         try {

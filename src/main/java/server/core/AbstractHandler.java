@@ -4,9 +4,7 @@ import common.Errors;
 import common.Methods;
 import common.Request;
 import common.Response;
-import common.objects.Body;
-import common.objects.Message;
-import common.objects.User;
+import common.objects.*;
 import server.OnlineManager;
 
 import java.sql.SQLException;
@@ -66,11 +64,13 @@ public abstract class AbstractHandler<T extends Body> {
 
     }
 
-    protected static void sendAllMessage(Message message, List<User> addressees) {
+    protected static void sendAllNewDialog(int dialogId, List<User> addressees) {
         Response messageToUsers = new Response();
         messageToUsers.setStatus(Response.OK);
-        messageToUsers.setType(Methods.NEW_MESSAGE);
-        messageToUsers.setBody(message.toJSONObject());
+        messageToUsers.setType(Methods.ADDED_TO_DIALOG);
+        AddedToDialog addedToDialog = new AddedToDialog();
+        addedToDialog.setDialogId(dialogId);
+        messageToUsers.setBody(addedToDialog.toJSONObject());
         OnlineManager.getInstance().sendAll(messageToUsers, addressees.stream()
                 .map(User::getLogin)
                 .collect(Collectors.toList()));

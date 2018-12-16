@@ -23,8 +23,8 @@ public class Dialog extends Body {
     public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
-    public void addMessage(Message m)
-    {
+
+    public void addMessage(Message m) {
         messages.add(m);
     }
 

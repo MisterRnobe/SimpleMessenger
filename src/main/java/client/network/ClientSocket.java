@@ -7,7 +7,6 @@ import com.alibaba.fastjson.JSON;
 import common.Methods;
 import common.Request;
 import common.Response;
-import common.objects.requests.GetFileRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
@@ -39,11 +38,14 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_FILE, GetFileQuery::onHandle);
         handlers.put(Methods.GET_USER, GetUserQuery::onHandle);
         handlers.put(Methods.NEW_MESSAGE, NewMessageConsumer::onHandle);
+        handlers.put(Methods.ADDED_TO_DIALOG, AddedToDialog::onHandle);
+        handlers.put(Methods.GET_DIALOG_INFO, GetDialogInfoQuery::onHandle);
     }
 
     public static ClientSocket getInstance() {
         return instance;
     }
+
     public void send(Request r) throws IOException {
         String s = JSON.toJSONString(r);
         System.out.println("Sending: "+s);

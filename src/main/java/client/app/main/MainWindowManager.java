@@ -21,6 +21,7 @@ import java.util.TreeMap;
 public class MainWindowManager {
     private static MainWindowManager instance;
     private static MainWindowController mainWindow;
+
     public static MainWindowManager getInstance() {
         return instance;
     }
@@ -28,7 +29,7 @@ public class MainWindowManager {
     private final Map<Integer, AbstractDialogWrapper> dialogControllerMap = new TreeMap<>();
     private AbstractDialogWrapper currentDialog = null;
 
-    private MainWindowManager(Stage stage) throws IOException{
+    private MainWindowManager(Stage stage) throws IOException {
         stage.setTitle("Simple messenger");
         initializeListeners();
         stage.setResizable(true);
@@ -43,29 +44,26 @@ public class MainWindowManager {
         }
     }
 
-    public static void start(Stage stage) throws IOException{
+    public static void start(Stage stage) throws IOException {
         instance = new MainWindowManager(stage);
     }
 
-    public <E extends AbstractWindow> E replaceWindow(Supplier<E> windowSupplier)
-    {
+    public <E extends AbstractWindow> E replaceWindow(Supplier<E> windowSupplier) {
         E window = null;
         try {
             window = windowSupplier.get();
             mainWindow.replaceWindow(window);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return window;
     }
-    public void closeWindow()
-    {
+
+    public void closeWindow() {
         mainWindow.closeTopWindow();
     }
-    public <E extends AbstractWindow> E displayWindow(Supplier<E> windowSupplier)
-    {
+
+    public <E extends AbstractWindow> E displayWindow(Supplier<E> windowSupplier) {
         E window = null;
         try {
             window = windowSupplier.get();
@@ -75,8 +73,8 @@ public class MainWindowManager {
         }
         return window;
     }
-    public void createEmptyDialog(User u)
-    {
+
+    public void createEmptyDialog(User u) {
         try {
             NewDialogWrapper wrapper = new NewDialogWrapper(u);
             mainWindow.showDialog(wrapper.getRoot());
@@ -85,43 +83,39 @@ public class MainWindowManager {
         }
 
     }
-    public int getOpenedDialogId()
-    {
-        return currentDialog == null? -1:currentDialog.getDialogId();
+
+    public int getOpenedDialogId() {
+        return currentDialog == null ? -1 : currentDialog.getDialogId();
     }
-    public void setDialog(int dialogId)
-    {
+
+    public void setDialog(int dialogId) {
         AbstractDialogBean bean = DialogManager.getInstance().getDialogById(dialogId);
         if (bean.messages().size() == 0) {
             try {
-                GetDialogQuery.sendQuery(dialogId, d-> setDialog(d.getDialogId()));
+                GetDialogQuery.sendQuery(dialogId, d -> setDialog(d.getDialogId()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else
-        {
+        } else {
             try {
                 AbstractDialogWrapper wrapper = dialogControllerMap.getOrDefault(dialogId, AbstractDialogWrapper.createOf(bean));
                 this.dialogControllerMap.put(bean.dialogId, wrapper);
-                Platform.runLater(()->mainWindow.showDialog(wrapper.getRoot()));
+                Platform.runLater(() -> mainWindow.showDialog(wrapper.getRoot()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
     }
-    private void initializeListeners()
-    {
+
+    private void initializeListeners() {
         DialogManager.getInstance().addDialogListener(change -> {
-            if (change.wasAdded())
-            {
+            if (change.wasAdded()) {
                 AbstractDialogBean dialogBean = change.getValueAdded();
                 try {
                     DialogChooserController chooserController = DialogChooserController.create(dialogBean);
                     mainWindow.addDialogInfo(chooserController);
-                }catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

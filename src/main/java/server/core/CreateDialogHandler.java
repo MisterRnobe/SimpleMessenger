@@ -1,7 +1,6 @@
 package server.core;
 
 import common.Errors;
-import common.Response;
 import common.objects.*;
 import common.objects.requests.CreateDialogRequest;
 import server.database.DatabaseExtractor;
@@ -9,11 +8,10 @@ import server.database.DatabaseManager;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
 
 public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
     private User lastPartner;
-    private Message lastMessage;
+    private int dialogId;
 
 
     public CreateDialogHandler(String login) {
@@ -30,8 +28,7 @@ public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
         int messageId = extractor.addMessage(dialogId, login, body.getInitialMessage(), System.currentTimeMillis());
         extractor.setLastMessage(dialogId, messageId);
         FullDialog fullDialog = extractor.getFullDialog(dialogId, login);
-        List<Message> messageList = fullDialog.getDialog().getMessages();
-        lastMessage = messageList.get(messageList.size() - 1);
+        this.dialogId = fullDialog.getInfo().getDialogId();
         lastPartner = ((DialogInfo) fullDialog.getInfo()).getPartner();
 
         return fullDialog;
@@ -40,7 +37,9 @@ public class CreateDialogHandler extends AbstractHandler<CreateDialogRequest> {
 
     @Override
     protected void beforeSend() {
-        AbstractHandler.sendAllMessage(lastMessage, Arrays.asList(lastPartner));
+
+
+        AbstractHandler.sendAllNewDialog(dialogId, Arrays.asList(lastPartner));
 
     }
 }

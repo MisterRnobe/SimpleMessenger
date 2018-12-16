@@ -132,7 +132,7 @@ public class EventSocket extends WebSocketAdapter {
         handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
         handlers.put(Methods.HOOK_USER_STATUS, r -> new HookUserStatusHandler(this).handle(r));
         handlers.put(Methods.FIND_USERS, r -> new FindUsersHandler().handle(r));
-        //handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
+        handlers.put(Methods.GET_DIALOG_INFO, r->new GetDialogInfoHandler(login).handle(r));
         handlers.put(Methods.READ_MESSAGES, r -> new ReadMessagesHandler(login).handle(r));
         handlers.put(Methods.GET_PROFILE, r -> new UserProfileHandler().handle(r));
         handlers.put(Methods.GET_FILE, r -> new FileHandler().handle(r));
