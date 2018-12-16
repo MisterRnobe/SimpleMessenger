@@ -129,6 +129,11 @@ public class MySQLExtractor implements DatabaseExtractor {
         }, sqlMask, sqlMask);
     }
 
+    private Message getLastMessage(Integer dialogId){
+        return new Message();
+    }
+
+
     @Override
     public List<DialogMarker> getDialogs(String login, Integer count) throws SQLException {
         String query = "SELECT d.dialog_id AS dialog_id, d.type as type from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = ? ORDER BY time LIMIT " + count + ";";
@@ -146,39 +151,6 @@ public class MySQLExtractor implements DatabaseExtractor {
         dialogs.addAll(groups);
         return dialogs;
 
-        /*String query = "SELECT d.dialog_id AS dialog_id, d.dialog_name AS dialog_name, d.creator AS creator, d.last_message_id as message_id, d.type as type, d.has_photo as has_photo, m.sender as sender, m.text as text, m.time as time, m.is_system as is_system from user_dialog AS u_d LEFT JOIN dialogs AS d on u_d.dialog_id=d.dialog_id LEFT JOIN messages as m ON d.last_message_id = m.message_id where login = ? ORDER BY time LIMIT "+count+";";
-
-        DialogList dialogList = connector.select(query, rs->{
-            DialogList templateList = new DialogList();
-            while (rs.next())
-            {
-                DialogInfo info = buildDialogInfo(rs);
-                Message m = buildMessage(rs);
-                info.setLastMessage(m);
-                templateList.addDialog(info);
-            }
-            return templateList;
-        },login);
-        if (dialogList.getDialogs().size() == 0)
-            return dialogList;
-        for(DialogInfo di: dialogList.getDialogs())
-        {
-            di.setUsers(getUsersInDialog(di.getDialogId()));
-        }
-        String dialogIds = dialogList.getDialogs().stream()
-                .map(DialogInfo::getDialogId)
-                .map(Object::toString)
-                .collect(Collectors.joining(",","(",")"));
-        query = "SELECT m.dialog_id as dialog_id, count(*) as count FROM messages as m left join unread_messages as u_m on m.message_id = u_m.message_id where u_m.login = ? AND m.dialog_id IN "+dialogIds+" group by m.dialog_id;";
-        connector.select(query, resultSet->{
-            while (resultSet.next()) {
-                int dialogId = resultSet.getInt("dialog_id");
-                int unread = resultSet.getInt("count");
-                dialogList.getDialogs().stream().filter(d->d.getDialogId() == dialogId).findFirst().ifPresent(dialogInfo -> dialogInfo.setUnread(unread));
-            }
-            return null;
-        },login);
-        return dialogList;*/
     }
 
     @Override
@@ -377,7 +349,8 @@ public class MySQLExtractor implements DatabaseExtractor {
             List<GroupInfo> list = new LinkedList<>();
             while (rs.next()) {
                 Message last = buildMessage(rs);
-                GroupInfo groupInfo = buildGroupInfo(rs).setLastMessage(last);
+                GroupInfo groupInfo = buildGroupInfo(rs);
+                groupInfo.setLastMessage(last);
                 list.add(groupInfo);
             }
             return list;

@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileSaver {
-    private static final String HOME_FOLDER = "D:/files/";
+    private static final String HOME_FOLDER = "/SimpleManager/files/";
     private static final String AVATAR_FOLDER = "avatars/";
     private static final String USER_AVATAR_FOLDER = "usr/";
     private static final String GROUP_AVATAR_FOLDER = "grp/";

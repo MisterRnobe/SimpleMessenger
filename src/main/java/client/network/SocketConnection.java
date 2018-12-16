@@ -7,7 +7,7 @@ import java.net.URI;
 import java.util.concurrent.Future;
 
 public class SocketConnection {
-    private static final URI uri = URI.create("ws://lirveez.sytes.net:200/connect/");
+    private static final URI uri = URI.create("ws://localhost:200/connect/");
     private static final int MAX_MESSAGE_SIZE = 104857600;
     private static Session SESSION;
     private static WebSocketClient client;
