@@ -2,6 +2,8 @@ package client.app;
 
 import client.app.initial.InitialWindowController;
 import client.app.main.MainWindowManager;
+import client.controllers.ErrorController;
+import client.controllers.ImagePicker;
 import client.network.SocketConnection;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,6 +38,7 @@ public class ApplicationManager extends Application{
     {
         Platform.runLater(()->{
             try {
+
                 MainWindowManager.start(instance.mainStage);
             } catch (IOException e) {
                 e.printStackTrace();

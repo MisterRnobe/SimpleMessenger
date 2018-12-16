@@ -1,5 +1,7 @@
 package client.network;
 
+import client.app.main.MainWindowManager;
+import client.controllers.ErrorController;
 import client.network.queries.*;
 import com.alibaba.fastjson.JSON;
 import common.Methods;
@@ -65,7 +67,18 @@ public class ClientSocket extends WebSocketAdapter {
     }
 
     @Override
+    public void onWebSocketClose(int statusCode, String reason) {
+        System.out.println("CLOSE: " + reason);
+        MainWindowManager.getInstance().displayWindow(ErrorController::create);
+
+        //TODO reconnect
+    }
+
+    @Override
     public void onWebSocketError(Throwable cause) {
         System.out.println("ERROR: "+cause.getMessage());
+        MainWindowManager.getInstance().displayWindow(ErrorController::create);
+                //.replaceWindow(ErrorController::create);
+
     }
 }

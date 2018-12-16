@@ -60,9 +60,10 @@ public class InitialWindowController {
             e.printStackTrace();
         }
     }
+    //todo мб обработчик с.да
     private void onFail(Integer code)
     {
-        Platform.runLater(()-> errorLabel.setText("Ошибка: "+code));
+        Platform.runLater(()->errorLabel.setText("Ошибка: "+code));
     }
 
     @FXML
