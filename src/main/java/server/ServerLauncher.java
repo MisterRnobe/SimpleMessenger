@@ -27,8 +27,6 @@ public class ServerLauncher {
         contextHandler.setContextPath("/");
         server.setHandler(contextHandler);
 
-
-
         contextHandler.addServlet(EventServlet.class,"/connect/");
         //DatabaseConnectorOld.init();
         try {
