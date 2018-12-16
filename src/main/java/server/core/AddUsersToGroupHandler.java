@@ -23,7 +23,7 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
     private List<String> users;
     private GroupModification response;
     public AddUsersToGroupHandler(String login) {
-        super(AddUsersToGroupRequest.class, new String[]{"users","dialogId"}, login);
+        super(AddUsersToGroupRequest.class, new String[]{"userDBS","dialogId"}, login);
     }
 
     @Override
@@ -31,11 +31,11 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
         //DatabaseConnectorOld connector = DatabaseConnectorOld.getInstance();
         throw new HandleError(Errors.INTERNAL_ERROR);
         /*DatabaseExtractor extractor = DatabaseManager.getExtractor();
-        users = extractor.getUsersInDialog(body.getDialogId()).stream()
-                .map(User::getLogin).collect(Collectors.toList());
-        extractor.addUsersToDialog(body.getDialogId(), body.getUsers());
+        userDBS = extractor.getUsersInDialog(body.getDialogId()).stream()
+                .map(UserDB::getLogin).collect(Collectors.toList());
+        extractor.addUsersToDialog(body.getDialogId(), body.getUserDBS());
         LinkedList<Integer> messageIds = new LinkedList<>();
-        for(String u: body.getUsers())
+        for(String u: body.getUserDBS())
         {
             messageIds.add(extractor.addMessage(body.getDialogId(), null, login+" added "+u, System.currentTimeMillis()));
         }
@@ -45,13 +45,13 @@ public class AddUsersToGroupHandler extends AbstractHandler<AddUsersToGroupReque
         }
         response = new GroupModification();
         response.setType(GroupModification.NEW_USERS);
-        List<User> users = new LinkedList<>();
-        for (String login: body.getUsers())
+        List<UserDB> userDBS = new LinkedList<>();
+        for (String login: body.getUserDBS())
         {
-            users.add(extractor.getUser(login));
+            userDBS.add(extractor.getUser(login));
         }
-        //response.setUsers(body.getUsers().stream().map(extractor::getUser).collect(Collectors.toList()));
-        response.setUsers(users);
+        //response.setUserDBS(body.getUserDBS().stream().map(extractor::getUser).collect(Collectors.toList()));
+        response.setUserDBS(userDBS);
         response.setFrom(login);
         response.setDialogId(body.getDialogId());
         response.setMessages(extractor.getMessagesByIds(messageIds));

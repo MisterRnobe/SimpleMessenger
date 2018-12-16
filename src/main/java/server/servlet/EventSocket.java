@@ -1,7 +1,6 @@
 package server.servlet;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import common.Errors;
 import common.Methods;
 import common.Request;
@@ -9,7 +8,9 @@ import common.Response;
 import common.objects.User;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import server.OnlineManager;
+import server.ServerLauncher;
 import server.core.*;
 import server.database.DatabaseManager;
 
@@ -27,6 +28,8 @@ public class EventSocket extends WebSocketAdapter {
     private SendMessageHandler messageHandler;
 
     private List<Runnable> onCloseListeners = new LinkedList<>();
+
+    private ClassPathXmlApplicationContext context;
 
     @Override
     public void onWebSocketConnect(Session sess) {
@@ -73,7 +76,7 @@ public class EventSocket extends WebSocketAdapter {
     }
 
     private Response onLogin(Request request) {
-        Response r = new LoginHandler().handle(request);
+        Response r = context.getBean(LoginHandler.class).handle(request);
         if (r.getStatus() == Response.OK) {
             this.login = request.getBody().getString("login");
             OnlineManager.getInstance().setOnline(login, this);
@@ -115,27 +118,29 @@ public class EventSocket extends WebSocketAdapter {
     }
 
     private void onStart() {
-        handlers.put(Methods.REGISTER, r -> new RegistrationHandler().handle(r));
+        context = ServerLauncher.getContext();
+        //handlers.put(Methods.REGISTER, r -> new RegistrationHandler().handle(r));
         handlers.put(Methods.LOGIN, this::onLogin);
-        handlers.put(Methods.VERIFY_DATA, r -> new VerifyDataHandler().handle(r));
+        //handlers.put(Methods.VERIFY_DATA, r -> new VerifyDataHandler().handle(r));
     }
 
     private void onLogin(String login) {
         handlers.clear();
-        this.messageHandler = new SendMessageHandler(login);
-
-        handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
-        handlers.put(Methods.CREATE_DIALOG, r -> new CreateDialogHandler(login).handle(r));
-        handlers.put(Methods.CREATE_CHANNEL, r -> new CreateChannelHandler(login).handle(r));
-        handlers.put(Methods.CREATE_GROUP, r -> new CreateGroupHandler(login).handle(r));
-        handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
-        handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
-        handlers.put(Methods.HOOK_USER_STATUS, r -> new HookUserStatusHandler(this).handle(r));
-        handlers.put(Methods.FIND_USERS, r -> new FindUsersHandler().handle(r));
-        //handlers.put(Methods.MODIFY_GROUP, r->new AddUsersToGroupHandler(login).handle(r));
-        handlers.put(Methods.READ_MESSAGES, r -> new ReadMessagesHandler(login).handle(r));
-        handlers.put(Methods.GET_PROFILE, r -> new UserProfileHandler().handle(r));
-        handlers.put(Methods.GET_FILE, r -> new FileHandler().handle(r));
-        handlers.put(Methods.GET_USER, r -> new GetUserHandler().handle(r));
+        GetDialogsHandler getDialogsHandler = context.getBean(GetDialogsHandler.class);
+        getDialogsHandler.setLogin(login);
+        handlers.put(Methods.GET_DIALOGS, getDialogsHandler::handle);
+//        this.messageHandler = new SendMessageHandler(login);
+//        handlers.put(Methods.SEND_MESSAGE, this::onSendMessage);
+//        handlers.put(Methods.CREATE_DIALOG, r -> new CreateDialogHandler(null, null, null).handle(r));
+//        handlers.put(Methods.CREATE_CHANNEL, r -> new CreateChannelHandler(login).handle(r));
+//        handlers.put(Methods.CREATE_GROUP, r -> new CreateGroupHandler(login).handle(r));
+//        handlers.put(Methods.GET_DIALOGS, r -> new GetDialogsHandler(login).handle(r));
+//        handlers.put(Methods.GET_DIALOG, r -> new GetDialogHandler(login).handle(r));
+//        handlers.put(Methods.HOOK_USER_STATUS, r -> new HookUserStatusHandler(this).handle(r));
+//        handlers.put(Methods.FIND_USERS, r -> new FindUsersHandler().handle(r));
+//        handlers.put(Methods.READ_MESSAGES, r -> new ReadMessagesHandler(login).handle(r));
+//        handlers.put(Methods.GET_PROFILE, r -> new UserProfileHandler().handle(r));
+//        handlers.put(Methods.GET_FILE, r -> new FileHandler().handle(r));
+//        handlers.put(Methods.GET_USER, r -> new GetUserHandler().handle(r));
     }
 }

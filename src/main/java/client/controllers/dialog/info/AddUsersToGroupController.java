@@ -58,7 +58,7 @@ public class AddUsersToGroupController extends AbstractWindow {
     {
         //DialogBean bindDialog = ApplicationBank.getInstance().getDialogById(dialogId);
         //DialogBean bindDialog = DialogManager.getInstance().getDialogById(dialogId);
-        //List<User> partners = bindDialog.getPartners().stream().map(s->ApplicationBank.getInstance().getUserByLogin(s)).collect(Collectors.toList());
+        //List<UserDB> partners = bindDialog.getPartners().stream().map(s->ApplicationBank.getInstance().getUserByLogin(s)).collect(Collectors.toList());
         List<User> partners = ((GroupBean)DialogManager.getInstance().getDialogById(dialogId)).getMembers();
         List<User> friends = UserSupplier.getInstance().getFriendList();
         friends.removeAll(partners);

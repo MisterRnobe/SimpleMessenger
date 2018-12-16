@@ -82,7 +82,7 @@ public class MessageController {
     }
     public static Node create(Message m) throws IOException
     {
-        FXMLLoader loader = new FXMLLoader(MessageController.class.getResource("Message.fxml"));
+        FXMLLoader loader = new FXMLLoader(MessageController.class.getResource("MessageDB.fxml"));
         Node node = loader.load();
         MessageController controller = loader.getController();
         controller.setMessage(m);

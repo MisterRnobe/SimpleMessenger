@@ -22,7 +22,7 @@
                   <Button mnemonicParsing="false" onAction="#onClick" text="Добавить" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
-            <AnchorPane prefHeight="290.0" style="-fx-background-color: #eee;" fx:id="userList"/>
+            <AnchorPane prefHeight="290.0" style="-fx-background-color: #eee;" fx:id="userDBList"/>
          </children>
       </VBox>
    </children>

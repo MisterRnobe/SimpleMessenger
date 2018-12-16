@@ -39,7 +39,7 @@ public class DialogController {
     }
 
     public static DialogController create() throws IOException {
-        FXMLLoader loader = new FXMLLoader(DialogController.class.getResource("Dialog.fxml"));
+        FXMLLoader loader = new FXMLLoader(DialogController.class.getResource("DialogDB.fxml"));
         loader.load();
         return loader.getController();
     }

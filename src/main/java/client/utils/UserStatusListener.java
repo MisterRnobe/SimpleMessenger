@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public class UserStatusListener {
     private static final UserStatusListener instance = new UserStatusListener();
-    //private final Map<String, List<Consumer<User>>> handlers = new TreeMap<>();
+    //private final Map<String, List<Consumer<UserDB>>> handlers = new TreeMap<>();
     private final CallbackMap<User> handlers = new CallbackMap<>();
     private UserStatusListener()
     {}

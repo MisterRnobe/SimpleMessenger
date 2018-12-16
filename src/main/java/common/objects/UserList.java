@@ -22,7 +22,7 @@ public class UserList extends Body{
     @Override
     public JSONObject toJSONObject() {
         JSONObject o = new JSONObject();
-        o.put("users", users);
+        o.put("userDBS", users);
         return o;
     }
 }

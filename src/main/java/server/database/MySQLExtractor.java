@@ -24,7 +24,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public boolean verifyUser(UserPasswordData userPasswordData) throws SQLException {
-        return connector.select("SELECT COUNT(*) FROM users WHERE login = ? AND password = ?;",
+        return connector.select("SELECT COUNT(*) FROM userDBS WHERE login = ? AND password = ?;",
                 resultSet ->
                 {
                     if (resultSet.next())
@@ -35,7 +35,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public void addUser(RegistrationData registrationData) throws SQLException {
-        connector.insert("users", CustomMap.create()
+        connector.insert("userDBS", CustomMap.create()
                 .add("login", registrationData.getLogin())
                 .add("password", hash256(registrationData.getPassword()))
                 .add("name", registrationData.getName())
@@ -106,7 +106,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public List<User> getUsersInDialog(Integer dialogId) throws SQLException {
-        String query = "SELECT u.login as login, u.name as name, u.has_avatar as has_avatar FROM user_dialog AS u_d LEFT JOIN users AS u ON u_d.login = u.login WHERE dialog_id = ?;";
+        String query = "SELECT u.login as login, u.name as name, u.has_avatar as has_avatar FROM user_dialog AS u_d LEFT JOIN userDBS AS u ON u_d.login = u.login WHERE dialog_id = ?;";
         return connector.select(query, resultSet -> {
             List<User> users = new LinkedList<>();
             while (resultSet.next()) {
@@ -119,7 +119,7 @@ public class MySQLExtractor implements DatabaseExtractor {
     @Override
     public List<User> findUsers(String mask) throws SQLException {
         String sqlMask = "%" + mask + "%";
-        String query = "SELECT u.login AS login, u.name as name, o.last_online as last_online, o.online AS online, u.has_avatar AS has_avatar FROM users AS u LEFT JOIN online AS o ON u.login = o.login WHERE u.login LIKE ? OR u.name LIKE ?;";
+        String query = "SELECT u.login AS login, u.name as name, o.last_online as last_online, o.online AS online, u.has_avatar AS has_avatar FROM userDBS AS u LEFT JOIN online AS o ON u.login = o.login WHERE u.login LIKE ? OR u.name LIKE ?;";
         return connector.select(query, resultSet -> {
             List<User> users = new LinkedList<>();
             while (resultSet.next()) {
@@ -153,7 +153,7 @@ public class MySQLExtractor implements DatabaseExtractor {
             while (rs.next())
             {
                 DialogInfo info = buildDialogInfo(rs);
-                Message m = buildMessage(rs);
+                MessageDB m = buildMessage(rs);
                 info.setLastMessage(m);
                 templateList.addDialog(info);
             }
@@ -163,7 +163,7 @@ public class MySQLExtractor implements DatabaseExtractor {
             return dialogList;
         for(DialogInfo di: dialogList.getDialogs())
         {
-            di.setUsers(getUsersInDialog(di.getDialogId()));
+            di.setUserDBS(getUsersInDialog(di.getDialogId()));
         }
         String dialogIds = dialogList.getDialogs().stream()
                 .map(DialogInfo::getDialogId)
@@ -183,7 +183,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public UserProfile getUserProfile(String login) throws SQLException {
-        return connector.select("SELECT login, email, info, name, has_avatar FROM users WHERE login = ?;", resultSet -> {
+        return connector.select("SELECT login, email, info, name, has_avatar FROM userDBS WHERE login = ?;", resultSet -> {
             UserProfile userProfile = new UserProfile();
             if (resultSet.next()) {
                 userProfile = ObjectsBuilder.buildProfile(resultSet);
@@ -218,7 +218,7 @@ public class MySQLExtractor implements DatabaseExtractor {
 
     @Override
     public User getUser(String login) throws SQLException {
-        return connector.select("SELECT login, name, has_avatar FROM users WHERE login = ?;", rs ->
+        return connector.select("SELECT login, name, has_avatar FROM userDBS WHERE login = ?;", rs ->
         {
             User u = null;
             if (rs.next())
@@ -343,7 +343,7 @@ public class MySQLExtractor implements DatabaseExtractor {
             return dialogMarkers;
         });
         //Extracting a partner
-        query = "SELECT u.login AS login, u.name AS name, u.has_avatar AS has_avatar, u_d.dialog_id as dialog_id FROM user_dialog AS u_d LEFT JOIN users AS u ON u_d.login = u.login WHERE u_d.dialog_id IN " + wrappedIds + " AND u_d.login <> ?;";
+        query = "SELECT u.login AS login, u.name AS name, u.has_avatar AS has_avatar, u_d.dialog_id as dialog_id FROM user_dialog AS u_d LEFT JOIN userDBS AS u ON u_d.login = u.login WHERE u_d.dialog_id IN " + wrappedIds + " AND u_d.login <> ?;";
         final Map<Integer, User> partners = connector.select(query, rs -> {
             Map<Integer, User> map = new TreeMap<>();
             while (rs.next()) {

@@ -13,7 +13,7 @@ class GroupWrapper extends AbstractDialogWrapper<GroupBean> {
     }
     private void init()
     {
-        /*dialogBean.users().addListener((ListChangeListener<String>) c -> {
+        /*dialogBean.userDBS().addListener((ListChangeListener<String>) c -> {
             int newSize = c.getList().size();
             Platform.runLater(()->dialogController.getInfo().setText(newSize + " человек(а)"));
         });*/

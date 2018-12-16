@@ -3,6 +3,7 @@ package client.app.initial;
 import client.app.ApplicationManager;
 import client.app.registration.RegistrationController;
 import client.network.queries.AuthorizationQuery;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -61,7 +62,7 @@ public class InitialWindowController {
     }
     private void onFail(Integer code)
     {
-        errorLabel.setText("Ошибка: "+code);
+        Platform.runLater(()->errorLabel.setText("Ошибка: "+code));
     }
 
     @FXML

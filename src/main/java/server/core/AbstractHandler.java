@@ -16,11 +16,14 @@ import java.util.stream.Collectors;
 public abstract class AbstractHandler<T extends Body> {
     private final Class<T> requiredClass;
     private final String[] requiredFields;
-    protected final String login;
+    protected String login;
 
     public AbstractHandler(Class<T> requiredClass, String[] requiredFields, String login) {
         this.requiredClass = requiredClass;
         this.requiredFields = requiredFields;
+        this.login = login;
+    }
+    public void setLogin(String login){
         this.login = login;
     }
 
@@ -45,7 +48,6 @@ public abstract class AbstractHandler<T extends Body> {
             r.setCode(Errors.WRONG_REQUEST_PARAMETERS);
         } else {
             try {
-
                 Body b = onHandle(request.getBody().toJavaObject(requiredClass));
                 r.setStatus(Response.OK);
                 r.setBody(b.toJSONObject());
