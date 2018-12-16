@@ -5,15 +5,28 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import server.servlet.EventServlet;
 
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.PrintStream;
+
 public class ServerLauncher {
     public static void main(String[] args) {
+
+
+        try {
+            FileOutputStream outputStream = new FileOutputStream("/SimpleManager/log.log");
+            PrintStream printStream = new PrintStream(outputStream);
+            System.setOut(printStream);
+
+        } catch (Exception ignored) {
+
+        }
+
         int port = 8081;
         if (args.length > 0)
             try {
                 port = Integer.parseInt(args[0]);
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         Server server = new Server();
@@ -25,7 +38,7 @@ public class ServerLauncher {
         contextHandler.setContextPath("/");
         server.setHandler(contextHandler);
 
-        contextHandler.addServlet(EventServlet.class,"/connect/");
+        contextHandler.addServlet(EventServlet.class, "/connect/");
         try {
             server.start();
             server.join();
