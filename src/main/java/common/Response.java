@@ -9,11 +9,11 @@ public class Response {
 
 
     private int status;
-    private Integer code; //In case error status
+    private Integer code = 0; //In case error status
     private JSONObject body;
     private String type;
-    public Response()
-    {
+
+    public Response() {
 
     }
 
