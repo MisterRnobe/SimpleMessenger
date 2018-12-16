@@ -5,6 +5,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.net.URI;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public class SocketConnection {
     private static final URI uri = URI.create("ws://localhost:8081/connect/");

@@ -29,16 +29,16 @@ public class ErrorController extends AbstractWindow {
     private Label message;
 
 
-    private void setText(String text)
-    {
+    private void setText(String text) {
         message.setText(text);
     }
+
     @FXML
-    public void reconnect(){
+    public void reconnect() {
         setText("JOPAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-   }
-    public static ErrorController create() throws IOException
-    {
+    }
+
+    public static ErrorController create(String s) throws IOException {
         FXMLLoader loader = new FXMLLoader(ErrorController.class.getResource("Error.fxml"));
         loader.load();
         return loader.getController();

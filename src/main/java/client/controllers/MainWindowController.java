@@ -160,16 +160,16 @@ public class MainWindowController {
     {
         if (window != null)
         {
-            root.getChildren().remove(window.getRoot());
+            Platform.runLater(()->root.getChildren().remove(window.getRoot()));
         }
             Pane p = newWindow.getRoot();
 
             if (window == null)
             {
                 locker.setOpacity(0.5d);
-                root.getChildren().add(locker);
+                Platform.runLater(()->root.getChildren().add(locker));
             }
-            root.getChildren().add(p);
+            Platform.runLater(()->root.getChildren().add(p));
 
             Timeline open = newWindow.getOnOpen();
             if (open == null) {
