@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" prefHeight="102.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.ErrorController">
+<AnchorPane fx:id="root" prefHeight="102.0" prefWidth="200.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.ErrorController">
     <children>
           <Label fx:id="title" alignment="CENTER" prefHeight="28.0" prefWidth="200.0" text="Error! :(" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
               <font>
@@ -22,6 +22,6 @@
                 </Label>
             </children>
         </VBox>
-      <Button onAction="#reconnect" alignment="CENTER" contentDisplay="TOP" layoutY="2.0" mnemonicParsing="false" text="Reconnect" textAlignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+      <Button alignment="CENTER" contentDisplay="TOP" layoutY="2.0" mnemonicParsing="false" onAction="#reconnect" text="Reconnect" textAlignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
     </children>
 </AnchorPane>
