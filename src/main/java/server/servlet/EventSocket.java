@@ -69,7 +69,7 @@ public class EventSocket extends WebSocketAdapter {
         onCloseListeners = null;
         if (login != null)
             OnlineManager.getInstance().setOffline(login);
-        System.out.println("CLOSED");
+        System.out.println("CLOSED casuse "+reason);
     }
 
     private Response onLogin(Request request) {

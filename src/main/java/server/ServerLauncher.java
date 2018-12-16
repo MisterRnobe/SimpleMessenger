@@ -25,8 +25,6 @@ public class ServerLauncher {
         contextHandler.setContextPath("/");
         server.setHandler(contextHandler);
 
-
-
         contextHandler.addServlet(EventServlet.class,"/connect/");
         try {
             server.start();
