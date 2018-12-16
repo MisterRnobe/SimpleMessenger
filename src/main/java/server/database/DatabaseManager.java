@@ -7,9 +7,9 @@ public class DatabaseManager {
     private static DatabaseExtractor extractorInterface;
     private static void init()
     {
-        String url = "jdbc:mariadb://nikitamedvedev.ddns.net:3306/simple_messenger";
+        String url = "jdbc:mysql://lirveez.sytes.net:3306/messenger";
         String login = "nikita";
-        String pass = "pass";
+        String pass = "nikita123456";
         try {
             DatabaseConnector connectorInterface = new MySQLConnector(DriverManager.getConnection(url, login, pass));
             extractorInterface = new MySQLExtractor(connectorInterface);
