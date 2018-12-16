@@ -100,6 +100,7 @@ public class MainWindowManager {
             try {
                 AbstractDialogWrapper wrapper = dialogControllerMap.getOrDefault(dialogId, AbstractDialogWrapper.createOf(bean));
                 this.dialogControllerMap.put(bean.dialogId, wrapper);
+                currentDialog = wrapper;
                 Platform.runLater(() -> mainWindow.showDialog(wrapper.getRoot()));
             } catch (IOException e) {
                 e.printStackTrace();

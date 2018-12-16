@@ -37,9 +37,10 @@ public class ClientSocket extends WebSocketAdapter {
         handlers.put(Methods.VERIFY_DATA, VerifyDataQuery::onHandle);
         handlers.put(Methods.GET_FILE, GetFileQuery::onHandle);
         handlers.put(Methods.GET_USER, GetUserQuery::onHandle);
-        handlers.put(Methods.NEW_MESSAGE, NewMessageConsumer::onHandle);
+//        handlers.put(Methods.NEW_MESSAGE, NewMessageConsumer::onHandle);
         handlers.put(Methods.ADDED_TO_DIALOG, AddedToDialog::onHandle);
         handlers.put(Methods.GET_DIALOG_INFO, GetDialogInfoQuery::onHandle);
+        handlers.put(Methods.GET_USERS_IN_DIALOG, GetUsersInDialogQuery::onHandle);
     }
     public static void setOnError(Consumer<String> action){
         onError = action;

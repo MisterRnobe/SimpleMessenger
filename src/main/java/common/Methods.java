@@ -5,7 +5,7 @@ public class Methods {
     public static final String LOGIN = "login";
     public static final String CREATE_DIALOG = "create_dialog";
     public static final String SEND_MESSAGE = "send_message";
-    public static final String NEW_MESSAGE = "new_message"; //Handle in client
+//    public static final String NEW_MESSAGE = "new_message"; //Handle in client
     public static final String ADDED_TO_DIALOG = "added_to_dialog"; // Handle by client
     public static final String GET_DIALOGS = "get_dialogs";
     public static final String GET_DIALOG = "get_dialog";
@@ -21,5 +21,6 @@ public class Methods {
     public static final String VERIFY_DATA = "verify_data";
     public static final String HOOK_USER_STATUS = "hook_user_status";
     public static final String GET_FILE = "get_file";
-    public static final String GET_DIALOG_INFO = "get_dialog_info";// TODO: 16.12.2018 Clinet
+    public static final String GET_DIALOG_INFO = "get_dialog_info";
+    public static final String GET_USERS_IN_DIALOG = "get_users_in_dialog";
 }
