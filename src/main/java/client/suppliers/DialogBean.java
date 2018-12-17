@@ -13,5 +13,6 @@ public class DialogBean extends AbstractDialogBean{
         this.partner = partner;
         this.unreadCount.set(unread);
         title.set(partner.getName());
+        avatarPath.set(partner.getAvatarPath());
     }
 }

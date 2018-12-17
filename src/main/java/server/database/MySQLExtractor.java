@@ -366,6 +366,13 @@ public class MySQLExtractor implements DatabaseExtractor {
         }, login);
         //Joining
         groupInfos.forEach(gi -> gi.setUsersCount(unread.getOrDefault(gi.getDialogId(), 0)));
+        groupInfos.forEach(g-> {
+            try {
+                g.setUsersCount(getUsersInDialog(g.getDialogId()).size());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
         return new LinkedList<>(groupInfos);
     }
 
